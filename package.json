@@ -1,0 +1,30 @@
+{
+  "name": "investogram-backend",
+  "version": "1.0.0",
+  "description": "Backend server for Investogram",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CS-407/Investogram-Backend.git"
+  },
+  "keywords": [
+    "stocks",
+    "investing",
+    "stock",
+    "market"
+  ],
+  "author": "Multiple",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CS-407/Investogram-Backend/issues"
+  },
+  "homepage": "https://github.com/CS-407/Investogram-Backend#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^6.9.0"
+  }
+}
