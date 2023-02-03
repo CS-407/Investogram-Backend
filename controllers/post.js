@@ -1,5 +1,9 @@
 const newPost = () => {}
 
+const getPost = () => {}
+
+const getPosts = () => {}
+
 const deletePost = () => {}
 
 const like = () => {}
