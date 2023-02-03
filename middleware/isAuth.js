@@ -1,0 +1,1 @@
+// Check if request is authenticated
