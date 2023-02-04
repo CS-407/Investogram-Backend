@@ -1,7 +1,7 @@
-const buy = () => {}
+exports.buy = () => {}
 
-const sell = () => {}
+exports.sell = () => {}
 
-const getTrades = () => {}
+exports.getTrades = () => {}
 
-const getLeaderboard = () => {}
+exports.getLeaderboard = () => {}

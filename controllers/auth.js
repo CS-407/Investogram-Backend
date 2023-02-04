@@ -1,9 +1,9 @@
-const login = () => {}
+exports.login = () => {}
 
-const register = () => {}
+exports.register = () => {}
 
-const verify = () => {}
+exports.verify = () => {}
 
-const forgot = () => {}
+exports.forgot = () => {}
 
-const reset = () => {}
+exports.reset = () => {}

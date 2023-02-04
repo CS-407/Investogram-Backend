@@ -1,13 +1,13 @@
-const setProfilePic = () => {}
+exports.setProfilePic = () => {}
 
-const sendFollowRequest = () => {}
+exports.sendFollowRequest = () => {}
 
-const acceptFollowRequest = () => {}
+exports.acceptFollowRequest = () => {}
 
-const rejectFollowRequest = () => {}
+exports.rejectFollowRequest = () => {}
 
-const getFollowers = () => {}
+exports.getFollowers = () => {}
 
-const getFollowees = () => {}
+exports.getFollowees = () => {}
 
-const getTrades = () => {}
+exports.getTrades = () => {}
