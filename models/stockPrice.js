@@ -6,6 +6,10 @@ const StockPriceSchema = mongoose.Schema({
         ref: 'stocks',
         required: true
     },
+    current_price: {
+        type: mongoose.Schema.Types.Number,
+        required: true
+    },
     time_pulled: {
         type: mongoose.Schema.Types.Date,
         default: new Date().toISOString()
