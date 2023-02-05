@@ -1,13 +1,62 @@
-exports.setProfilePic = () => {}
+exports.setProfilePic = async (req, res) => {
+    try {
 
-exports.sendFollowRequest = () => {}
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
 
-exports.acceptFollowRequest = () => {}
+exports.sendFollowRequest = async (req, res) => {
+    try {
 
-exports.rejectFollowRequest = () => {}
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
 
-exports.getFollowers = () => {}
+exports.acceptFollowRequest = async (req, res) => {
+    try {
 
-exports.getFollowees = () => {}
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
 
-exports.getTrades = () => {}
+exports.rejectFollowRequest = async (req, res) => {
+    try {
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getFollowers = async (req, res) => {
+    try {
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getFollowees = async (req, res) => {
+    try {
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getTrades = async (req, res) => {
+    try {
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
