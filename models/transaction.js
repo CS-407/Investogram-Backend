@@ -16,11 +16,11 @@ const TransactionSchema = mongoose.Schema({
         ref: 'stockprices',
         required: true
     },
-    num_shares: {
+    no_of_shares: {
         type: mongoose.Schema.Types.Number,
         required: true
     },
-    amount: {
+    amount_usd: {
         type: mongoose.Schema.Types.Number,
         required: true
     },

@@ -4,7 +4,7 @@ const router = express.Router();
 const stockController = require('../controllers/stock');
 
 // Buy stock
-router.post("/buy/:id", stockController.buy);
+router.post("/buy", stockController.buy);
 
 // Sell stock
 router.post("/sell/:id", stockController.sell);
