@@ -1,4 +1,4 @@
-exports.setProfilePic = async (req, res) => {
+exports.newPost = async (req, res) => {
     try {
 
     } catch (err) {
@@ -7,7 +7,7 @@ exports.setProfilePic = async (req, res) => {
     }
 }
 
-exports.sendFollowRequest = async (req, res) => {
+exports.getPost = async (req, res) => {
     try {
 
     } catch (err) {
@@ -16,7 +16,7 @@ exports.sendFollowRequest = async (req, res) => {
     }
 }
 
-exports.acceptFollowRequest = async (req, res) => {
+exports.getPosts = async (req, res) => {
     try {
 
     } catch (err) {
@@ -25,7 +25,7 @@ exports.acceptFollowRequest = async (req, res) => {
     }
 }
 
-exports.rejectFollowRequest = async (req, res) => {
+exports.deletePost = async (req, res) => {
     try {
 
     } catch (err) {
@@ -34,7 +34,7 @@ exports.rejectFollowRequest = async (req, res) => {
     }
 }
 
-exports.getFollowers = async (req, res) => {
+exports.like = async (req, res) => {
     try {
 
     } catch (err) {
@@ -43,7 +43,7 @@ exports.getFollowers = async (req, res) => {
     }
 }
 
-exports.getFollowees = async (req, res) => {
+exports.unlike = async (req, res) => {
     try {
 
     } catch (err) {
@@ -52,7 +52,7 @@ exports.getFollowees = async (req, res) => {
     }
 }
 
-exports.getTrades = async (req, res) => {
+exports.newComment = async (req, res) => {
     try {
 
     } catch (err) {
