@@ -1,5 +1,10 @@
 # Investogram-Backend
 
+Running server locally:
+```
+npm start
+```
+
 This is the backend repository for Investogram, which is a competitive investing platform 
 for people interested in the stock market. Users can use play money to invest in stocks with 
 real stock prices. 
