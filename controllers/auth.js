@@ -1,14 +1,49 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 
 const dotenv = require('dotenv');
 dotenv.config();
 
 exports.login = async (req, res) => {
-    const {} = req.body;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
 
     try {
+        const existingUser = User.findOne({ email: email });
 
+        if (!existingUser) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const isEqual = password == existingUser.password;
+
+        if (!isEqual) {
+            return res.status(401).json({ msg: 'Password incorrect' });
+        }
+
+        const payload = {
+            user: {
+                id: existingUser._id
+            }
+        }
+
+        jwt.sign(
+            payload,
+            process.env.SECRET,
+            {
+                expiresIn: 3600
+            },
+            (err, token) => {
+                if (err) throw err;
+                res.status(200).json({ token: token, user: existingUser })
+            }
+        )
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
@@ -16,12 +51,15 @@ exports.login = async (req, res) => {
 }
 
 exports.signup = async (req, res) => {
-    console.log(req.body);
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
 
     const { email, username, password, password2 } = req.body;
 
     if (password !== password2) {
-        console.log('\tPassword mismatch');
         return res.status(401).json({ msg: 'Passwords do not match' })
     }
 
