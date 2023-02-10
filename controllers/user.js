@@ -54,7 +54,7 @@ exports.getFollowees = async (req, res) => {
 
 exports.getTrades = async (req, res) => {
     try {
-
+        return res.status(200).json({ msg: 'Authorized' })
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });

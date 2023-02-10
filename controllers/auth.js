@@ -15,15 +15,13 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const existingUser = User.findOne({ email: email });
+        const existingUser = await User.findOne({ email: email });
 
         if (!existingUser) {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        const isEqual = password == existingUser.password;
-
-        if (!isEqual) {
+        if (password !== existingUser.password) {
             return res.status(401).json({ msg: 'Password incorrect' });
         }
 
