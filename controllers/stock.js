@@ -1,5 +1,7 @@
 const post = require("../models/post");
 const transaction = require("../models/transaction");
+const stock = require("../models/stock");
+const stockPrice = require("../models/stockPrice");
 
 exports.buy = async (req, res) => {
     try {
@@ -45,7 +47,42 @@ exports.sell = async (req, res) => {
 
 exports.getTrades = async (req, res) => {
     try {
-
+        const mongoose = require('mongoose');
+        let uid = req.params.user_id
+        let stock_id = req.params.stock_id
+        transaction.aggregate([
+            {
+              $match: {
+                  stock_id: mongoose.Types.ObjectId(stock_id),
+                  user_id: mongoose.Types.ObjectId(uid)
+              }
+            },
+            {
+                $lookup: {
+                    from: stock.collection.name,
+                    localField: 'stock_id',
+                    foreignField: '_id',
+                    as: 'StockData',
+                }
+            },
+            {
+                $lookup: {
+                    from: stockPrice.collection.name,
+                    localField: 'stock_price_id',
+                    foreignField: '_id',
+                    as: 'StockPriceData',
+                }
+            }
+          ]).exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'Server Error' });
+                return
+            } else {
+                res.status(200).json({ msg: 'Success', data: result});
+                return
+            }
+          });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
