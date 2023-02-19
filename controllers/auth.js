@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
 const dotenv = require('dotenv');
@@ -21,10 +22,12 @@ exports.login = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        if (password !== existingUser.password) {
+        const isEqual = await bcrypt.compare(password, existingUser.password);
+
+        if (!isEqual) {
             return res.status(401).json({ msg: 'Password incorrect' });
         }
-
+ 
         const payload = {
             user: {
                 id: existingUser._id
@@ -69,10 +72,12 @@ exports.signup = async (req, res) => {
             return res.status(401).json({ msg: 'User already exists' });
         }
 
+        const hashedPassword = await bcrypt.hash(password, 12);
+
         const newUser = new User({
             email: email,
             username: username,
-            password: password
+            password: hashedPassword
         });
 
         await newUser.save();
@@ -92,7 +97,7 @@ exports.signup = async (req, res) => {
             },
             (err, token) => {
                 if (err) throw err;
-                res.status(200).json({ user: { email: newUser.email, username: newUser.username }, token })
+                res.status(200).json({ user: newUser, token })
             }
         )
     } catch (err) {
