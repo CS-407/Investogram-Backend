@@ -31,6 +31,10 @@ const TransactionSchema = mongoose.Schema({
     post_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'posts'
+    },
+    buy: {
+        type: mongoose.Schema.Types.Boolean,
+        required: true
     }
 })
 
