@@ -16,11 +16,11 @@ const TransactionSchema = mongoose.Schema({
         ref: 'stockprices',
         required: true
     },
-    num_shares: {
+    no_of_shares: {
         type: mongoose.Schema.Types.Number,
         required: true
     },
-    amount: {
+    amount_usd: {
         type: mongoose.Schema.Types.Number,
         required: true
     },
@@ -31,6 +31,10 @@ const TransactionSchema = mongoose.Schema({
     post_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'posts'
+    },
+    buy: {
+        type: mongoose.Schema.Types.Boolean,
+        required: true
     }
 })
 

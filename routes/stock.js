@@ -4,13 +4,13 @@ const router = express.Router();
 const stockController = require('../controllers/stock');
 
 // Buy stock
-router.post("/buy/:id", stockController.buy);
+router.post("/buy", stockController.buy);
 
 // Sell stock
-router.post("/sell/:id", stockController.sell);
+router.post("/sell", stockController.sell);
 
 // Get Trades
-router.get("/trades", stockController.getTrades);
+router.get("/trades/:user_id/:stock_id", stockController.getTrades);
 
 // Get Leaderboard
 router.get("/leaderboard", stockController.getLeaderboard);
