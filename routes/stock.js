@@ -5,13 +5,13 @@ const stockController = require('../controllers/stock');
 const isAuth = require('../middleware/isAuth');
 
 // Buy stock
-router.post("/buy/:id", isAuth, stockController.buy);
+router.post("/buy", stockController.buy);
 
 // Sell stock
-router.post("/sell/:id", isAuth, stockController.sell);
+router.post("/sell", stockController.sell);
 
 // Get Trades
-router.get("/trades", isAuth, stockController.getTrades);
+router.get("/trades/:user_id/:stock_id", stockController.getTrades);
 
 // Get Leaderboard
 router.get("/leaderboard", isAuth, stockController.getLeaderboard);
