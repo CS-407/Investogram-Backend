@@ -12,6 +12,7 @@ exports.buy = async (req, res) => {
     session.startTransaction();
 
     try {
+
         // Balance logic
         uid = req.body.user_id
         const user = await User.findById(uid);
@@ -92,6 +93,7 @@ exports.getTrades = async (req, res) => {
         const mongoose = require('mongoose');
         let uid = req.params.user_id
         let stock_id = req.params.stock_id
+
         transaction.aggregate([
             {
               $match: {
@@ -116,6 +118,25 @@ exports.getTrades = async (req, res) => {
                 }
             }
           ]).exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'Server Error' });
+                return
+            } else {
+                res.status(200).json({ msg: 'Success', data: result});
+                return
+            }
+          });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getHistory = async (req, res) => {
+    try {
+        let stock_id = req.params.stock_id
+        stockPrice.where('stock_id').equals(stock_id).exec(function (err, result) {
             if (err) {
                 console.log(err)
                 res.status(500).json({ msg: 'Server Error' });
