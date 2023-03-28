@@ -12,7 +12,27 @@ exports.setProfilePic = async (req, res) => {
 
 exports.sendFollowRequest = async (req, res) => {
     try {
+        const id = req.user.id;
 
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const followId = req.body.userId;
+
+        const followUser = await User.findById(followId);
+
+        if (!followUser) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        followUser.requests.push(id);
+
+        await followUser.save();
+
+        res.status(200).json({ msg: 'Follow Request Sent' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
@@ -66,7 +86,7 @@ exports.getTrades = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        const trades = await Transaction.find({ user_id: id });
+        const trades = await Transaction.find({ user_id: id }).populate('stock_id');
 
         if (!trades) {
             return res.status(404).json({ msg: 'Trades not found' });

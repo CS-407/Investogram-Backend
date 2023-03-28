@@ -5,7 +5,7 @@ dotenv.config();
 
 module.exports = (req, res, next) => {
     // Get token from header
-    const token = req.header('Authorization');
+    const token = req.header('Authorization').split(" ")[1];
 
     // Check if token exists
     if (!token) {
@@ -13,6 +13,8 @@ module.exports = (req, res, next) => {
     }
 
     try {
+        console.log('token', token);
+
         // Decode token
         const decoded = jwt.verify(token, process.env.SECRET);
 
