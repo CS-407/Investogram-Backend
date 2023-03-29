@@ -12,6 +12,23 @@ exports.setProfilePic = async (req, res) => {
     }
 }
 
+exports.getFollowRequests = async (req, res) => {
+    try {
+        const id = req.user.id;
+
+        const user = await User.findById(id).select("requests").populate("requests", "username");
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        return res.status(200).json({ "users": user.requests });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 exports.sendFollowRequest = async (req, res) => {
     try {
         const id = req.user.id;
@@ -22,7 +39,11 @@ exports.sendFollowRequest = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        const followId = req.body.userId;
+        const followId = req.params.userId;
+
+        if (id === followId) {
+            return res.status(401).json({ msg: 'Cannot follow self' });
+        }
 
         const followUser = await User.findById(followId);
 

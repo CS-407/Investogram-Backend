@@ -30,17 +30,17 @@ const UserSchema = mongoose.Schema({
     },
     followers_list: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'users',
+        ref: 'User',
         default: []
     },
     following_list: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'users',
+        ref: 'User',
         default: []
     },
     requests: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'users',
+        ref: 'User',
         default: []
     }
 });

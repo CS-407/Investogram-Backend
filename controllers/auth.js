@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
 const dotenv = require('dotenv');
+const { sendForgotMail } = require('../services/email');
 dotenv.config();
 
 exports.login = async (req, res) => {
@@ -117,7 +118,17 @@ exports.verify = async (req, res) => {
 
 exports.forgot = async (req, res) => {
     try {
+        const { email } = req.body;
 
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ msg: 'No user with that email found' });
+        }
+
+        sendForgotMail(email, "somerandometoken");
+
+        res.status(200).json({ msg: 'Mail sent' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
