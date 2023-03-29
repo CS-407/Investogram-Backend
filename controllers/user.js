@@ -10,6 +10,23 @@ exports.setProfilePic = async (req, res) => {
     }
 }
 
+exports.getFollowRequests = async (req, res) => {
+    try {
+        const id = req.user.id;
+
+        const user = await User.findById(id).select("requests").populate("requests", "username");
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        return res.status(200).json({ "users": user.requests });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 exports.sendFollowRequest = async (req, res) => {
     try {
         const id = req.user.id;

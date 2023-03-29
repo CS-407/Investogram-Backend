@@ -10,6 +10,9 @@ router.get("/followers", isAuth, userController.getFollowers);
 // Get followees
 router.get("/followees", isAuth, userController.getFollowees);
 
+// Get follow requests
+router.get("/requests", isAuth, userController.getFollowRequests);
+
 // Send follow request
 router.post("/follow/:userId", isAuth, userController.sendFollowRequest);
 
