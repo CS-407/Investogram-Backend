@@ -11,7 +11,7 @@ router.get("/followers", isAuth, userController.getFollowers);
 router.get("/followees", isAuth, userController.getFollowees);
 
 // Send follow request
-router.post("/follow", isAuth, userController.sendFollowRequest);
+router.post("/follow/:userId", isAuth, userController.sendFollowRequest);
 
 // Accept follow request
 router.post("/follow/accept", isAuth, userController.acceptFollowRequest);

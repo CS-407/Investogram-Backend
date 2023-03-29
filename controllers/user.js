@@ -20,7 +20,7 @@ exports.sendFollowRequest = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        const followId = req.body.userId;
+        const followId = req.params.userId;
 
         const followUser = await User.findById(followId);
 
