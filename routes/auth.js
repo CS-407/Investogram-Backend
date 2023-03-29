@@ -11,7 +11,7 @@ router.post('/login', body('email').isEmail(), body('password').isLength({ min: 
 router.post('/signup', body('email').isEmail(), body('password').isLength({ min: 6 }), authController.signup);
 
 // Forgot
-router.post('/forgot', authController.forgot);
+router.post('/forgot', body('email').isEmail(), authController.forgot);
 
 // Reset
 router.patch('/reset', authController.reset);
