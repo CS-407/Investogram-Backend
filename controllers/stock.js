@@ -12,6 +12,7 @@ exports.buy = async (req, res) => {
     session.startTransaction();
 
     try {
+
         // Balance logic
         uid = req.body.user_id
         const user = await User.findById(uid);
@@ -92,6 +93,7 @@ exports.getTrades = async (req, res) => {
         const mongoose = require('mongoose');
         let uid = req.params.user_id
         let stock_id = req.params.stock_id
+
         transaction.aggregate([
             {
               $match: {
@@ -131,9 +133,65 @@ exports.getTrades = async (req, res) => {
     }
 }
 
+exports.getHistory = async (req, res) => {
+    try {
+        let stock_id = req.params.stock_id
+        stockPrice.where('stock_id').equals(stock_id).exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'Server Error' });
+                return
+            } else {
+                res.status(200).json({ msg: 'Success', data: result});
+                return
+            }
+          });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 exports.getLeaderboard = async (req, res) => {
     try {
 
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.populateStockPrices = async (req, res) => {
+    try {
+        const stocks = await stock.find();
+        const tickers = stocks.map(stock => stock.stock_ticker);
+        if (!tickers.length || tickers.length == 0) {
+            res.status(400).json({ msg: 'No stocks found' });
+            return
+        }
+
+        var weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+
+        var yahooFinance = require('yahoo-finance');
+        var result = await yahooFinance.historical({
+            symbols: tickers,
+            from: weekAgo.toISOString(),
+            to: new Date().toISOString()
+        });
+        //console.log(result)
+        for (resultTicker in result) {
+            var resultData = result[resultTicker]
+            var stockId = stocks.find(look => look.stock_ticker == resultTicker)._id;
+            for (priceInd in resultData) {
+                let price = resultData[priceInd];
+                let newPrice = { "stock_id": stockId, "current_price": price.close, "time_pulled": price.date };
+                console.log(newPrice)
+                //stockPrice.create(newPrice);
+            }
+        }
+        res.status(200).json({ msg: 'Success' });
+        return
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
