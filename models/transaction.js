@@ -8,7 +8,7 @@ const TransactionSchema = mongoose.Schema({
     },
     stock_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'stocks',
+        ref: 'Stock',
         required: true
     },
     stock_price_id: {

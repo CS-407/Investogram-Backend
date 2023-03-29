@@ -25,11 +25,13 @@
   "homepage": "https://github.com/CS-407/Investogram-Backend#readme",
   "dependencies": {
     "@sendgrid/mail": "^7.7.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-validator": "^6.14.3",
     "mongoose": "^6.9.0",
     "yahoo-finance": "^0.3.8"
+    "jsonwebtoken": "^9.0.0",
   }
 }

@@ -2,15 +2,16 @@ const express = require('express');
 const router = express.Router();
 
 const userController = require('../controllers/user');
+const isAuth = require('../middleware/isAuth');
 
 // Get followers
-router.get("/followers", userController.getFollowers);
+router.get("/followers", isAuth, userController.getFollowers);
 
 // Get followees
-router.get("/followees", userController.getFollowees);
+router.get("/followees", isAuth, userController.getFollowees);
 
 // Send follow request
-router.post("/follow", userController.sendFollowRequest);
+router.post("/follow", isAuth, userController.sendFollowRequest);
 
 // Accept follow request
 router.post("/follow/accept/:toFollow/:newFollower", userController.acceptFollowRequest);
