@@ -22,6 +22,10 @@ exports.sendFollowRequest = async (req, res) => {
 
         const followId = req.params.userId;
 
+        if (id === followId) {
+            return res.status(401).json({ msg: 'Cannot follow self' });
+        }
+
         const followUser = await User.findById(followId);
 
         if (!followUser) {
