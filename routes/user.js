@@ -4,10 +4,10 @@ const router = express.Router();
 const userController = require('../controllers/user');
 
 // Get followers
-router.get("/followers", userController.getFollowers);
+router.get("/followers/:_id", userController.getFollowers);
 
 // Get followees
-router.get("/followees", userController.getFollowees);
+router.get("/followees/:_id", userController.getFollowees);
 
 // Send follow request
 router.post("/follow", userController.sendFollowRequest);
