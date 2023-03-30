@@ -4,6 +4,9 @@ const router = express.Router();
 const stockController = require('../controllers/stock');
 const isAuth = require('../middleware/isAuth');
 
+// Add stock
+router.post("/add", stockController.add);
+
 // Buy stock
 router.post("/buy", stockController.buy);
 

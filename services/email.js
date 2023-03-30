@@ -4,12 +4,12 @@ dotenv.config();
 
 sg.setApiKey(process.env.SENDGRID_API_KEY);
 
-exports.sendForgotMail = (mail, token) => {
+exports.sendForgotMail = (mail, reset_token) => {
     const msg = {
         to: mail,
         from: 'darreniyer06@gmail.com',
         subject: 'Password Reset',
-        text: 'Follow this link to reset your password : http://localhost:3000/auth/resetpass?token=' + token
+        text: 'Your reset token is ' + reset_token
     }
 
     sg.send(msg).then(() => {

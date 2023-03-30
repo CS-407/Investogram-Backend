@@ -8,6 +8,24 @@ const stock = require("../models/stock");
 const stockPrice = require("../models/stockPrice");
 const transaction = require("../models/transaction");
 
+exports.add = async (req, res) => {
+    try {
+        const { stock_ticker, stock_name } = req.body;
+
+        const newStock = new stock({
+            stock_ticker: stock_ticker,
+            stock_name: stock_name
+        });
+
+        await newStock.save();
+
+        res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 exports.buy = async (req, res) => {
 
     const { startSession } = require('mongoose')

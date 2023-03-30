@@ -28,6 +28,11 @@ const UserSchema = mongoose.Schema({
         type: mongoose.SchemaTypes.Number,
         default: 0
     },
+    reset_token: {
+        type: mongoose.SchemaTypes.Number,
+        required: false,
+        default: 0
+    },
     followers_list: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'User',
