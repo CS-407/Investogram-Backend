@@ -1,15 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors')
 const dotenv = require('dotenv');
 dotenv.config();
+//new
+//const bodyParser = require("body-parser");
+//
 
 const app = express();
+app.use(cors());
+
+//new
+//app.use(bodyParser.urlencoded({ extended: false}));
+//app.use(bodyParser.json());
+//
+
 
 // Routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const stockRoutes = require('./routes/stock');
 const blogRoutes = require('./routes/blog');
+
+//new
+//const stockPriceRoutes = require('./routes/')
+//
 
 // Initialize Middleware
 app.use(express.urlencoded());
@@ -26,6 +41,10 @@ app.use('/api/user', userRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/blog', blogRoutes);
 
+//new
+mongoose.set('strictQuery', false);
+//
+
 mongoose.connect(process.env.MONGO_URI).then(() => {
     console.log('MongoDB Connected...');
     app.listen(process.env.PORT, () => {
@@ -33,4 +52,4 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
     })
 }).catch((err) => {
     console.log("Error occured " + err.message);
-})
+}) 
