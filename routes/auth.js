@@ -13,8 +13,11 @@ router.post('/signup', body('email').isEmail(), body('password').isLength({ min:
 // Forgot
 router.post('/forgot', body('email').isEmail(), authController.forgot);
 
-// Reset
-router.patch('/reset', authController.reset);
+// Reset password
+router.patch('/resetpass', body('email').isEmail(), authController.resetPassword);
+
+// Reset username
+router.patch('/resetusername', body('email').isEmail(), authController.resetUsername);
 
 // Verify
 router.post('/verify', authController.verify);
