@@ -16,4 +16,4 @@ const StockPriceSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('StockPrice', StockPriceSchema);
+module.exports = mongoose.model('StockPrice', StockPriceSchema, "stockprices");
