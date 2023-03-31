@@ -369,7 +369,7 @@ exports.populateStockPrices = async (req, res) => {
         const diff_in_days = Math.floor(diff_in_hours / 24);
 
         if (diff_in_days < 7) {
-            return res.status(100).json({ "msg": "Prices recently updated" });
+            return res.status(400).json({ "msg": "Prices recently updated" });
         }
 
         latest.last_pull = new Date();
@@ -402,8 +402,9 @@ exports.populateStockPrices = async (req, res) => {
             var stockId = stocks.find(look => look.stock_ticker == resultTicker)._id;
             for (priceInd in resultData) {
                 let price = resultData[priceInd];
-                let newPrice = { "stock_id": stockId, "current_price": price.close, "time_pulled": price.date };
-                console.log(newPrice)
+                let newPrice = new stockPrice({ "stock_id": stockId, "current_price": price.close, "time_pulled": price.date });
+                
+                await newPrice.save();
             }
         }
 
