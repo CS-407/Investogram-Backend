@@ -28,21 +28,26 @@ const UserSchema = mongoose.Schema({
         type: mongoose.SchemaTypes.Number,
         default: 0
     },
+    reset_token: {
+        type: mongoose.SchemaTypes.Number,
+        required: false,
+        default: 0
+    },
     followers_list: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'users',
+        ref: 'User',
         default: []
     },
     following_list: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'users',
+        ref: 'User',
         default: []
     },
     requests: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'users',
+        ref: 'User',
         default: []
     }
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema, "users");

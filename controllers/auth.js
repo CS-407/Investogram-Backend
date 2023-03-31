@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
 const dotenv = require('dotenv');
+const { sendForgotMail } = require('../services/email');
 dotenv.config();
 
 exports.login = async (req, res) => {
@@ -117,16 +118,81 @@ exports.verify = async (req, res) => {
 
 exports.forgot = async (req, res) => {
     try {
+        const { email } = req.body;
 
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ msg: 'No user with that email found' });
+        }
+
+        const new_reset_token = Math.floor((1 + Math.random()) * 10000);
+
+        user.reset_token = new_reset_token;
+
+        await user.save();
+
+        sendForgotMail(email, new_reset_token);
+
+        res.status(200).json({ msg: 'Mail sent' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
     }
 }
 
-exports.reset = async (req, res) => {
+exports.resetPassword = async (req, res) => {
     try {
+        const { email, password, password2, reset_token } = req.body;
 
+        if (password !== password2) {
+            return res.status(401).json({ msg: 'Passwords do not match' });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ msg: 'No user with that email found' });
+        }
+
+        if (user.reset_token != reset_token) {
+            return res.status(401).json({ msg: 'Invalid reset token' });
+        }
+
+        user.reset_token = 0;
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        user.password = hashedPassword;
+
+        await user.save();
+
+        res.status(200).json({ msg: 'Updated Successfully' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.resetUsername = async (req, res) => {
+    try {
+        const { email, new_username, reset_token } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ msg: 'No user with that email found' });
+        }
+
+        if (user.reset_token != reset_token) {
+            return res.status(401).json({ msg: 'Invalid reset token' });
+        }
+
+        user.reset_token = 0;
+        user.username = new_username;
+
+        await user.save();
+
+        res.status(200).json({ msg: 'Updated Successfully' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
