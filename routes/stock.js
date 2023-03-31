@@ -37,4 +37,7 @@ router.get("/purchases/:stock_id", stockController.getPurchases);
 //sprint1 - get popular stocks
 router.get("/popularstocks", stockController.getPopularStocks);
 
+// Get a single stock info
+router.get("/get/:id", stockController.getStock);
+
 module.exports = router;
