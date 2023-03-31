@@ -22,4 +22,7 @@ router.post("/follow/reject", isAuth, userController.rejectFollowRequest);
 // Get user's trades
 router.get("/trades", isAuth, userController.getTrades);
 
+// Send delete Request
+router.delete("/deleteAcc", userController.deleteAcc);
+
 module.exports = router;

@@ -115,7 +115,7 @@ exports.verify = async (req, res) => {
     }
 }
 
-exports.forgot = async (req, res) => {
+exports.forgotpass = async (req, res) => {
     try {
 
     } catch (err) {
@@ -124,7 +124,31 @@ exports.forgot = async (req, res) => {
     }
 }
 
-exports.reset = async (req, res) => {
+exports.resetuser = async (req, res) => {
+    console.log("Check Reset User");
+    try {
+        const email = req.body.email;
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+        const newusername = req.body.newusername;
+        const checkUsername = await User.findOne({username: newusername});
+        if (checkUsername) {
+            return res.status(404).json({ msg: 'Username Taken' });
+        }
+        user.username = newusername;
+        user.save();
+        console.log("Success");
+        res.status(200).json({ msg: 'Success' });
+    }
+    catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.resetpass = async (req, res) => {
     try {
 
     } catch (err) {
