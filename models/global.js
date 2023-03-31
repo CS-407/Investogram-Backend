@@ -7,4 +7,4 @@ const GlobalSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Global', GlobalSchema);
+module.exports = mongoose.model('Global', GlobalSchema, "globals");

@@ -1,12 +1,13 @@
 
 const { Model } = require("mongoose");
+const server = require("../server");
 const { findById } = require("../models/stock");
 const post = require("../models/post");
 const User = require("../models/user");
-const server = require("../server");
 const stock = require("../models/stock");
 const stockPrice = require("../models/stockPrice");
 const transaction = require("../models/transaction");
+const Global = require("../models/global");
 
 exports.add = async (req, res) => {
     try {
@@ -344,6 +345,41 @@ exports.getPopularStocks = async (req, res) => {
 
 exports.populateStockPrices = async (req, res) => {
     try {
+        // ------------------------------------
+        // Check when prices were last updated
+        // ------------------------------------
+        
+        const latest = await Global.findOne();
+
+        if (!latest) {
+            const new_latest = new Global({
+                last_pull: new Date()
+            });
+
+            await new_latest.save();
+        }
+        
+        const cur_date = new Date();
+
+        const t1 = latest.last_pull.getTime() / 1000;
+        const t2 = cur_date.getTime() / 1000;
+
+        const diff_in_seconds = t2 - t1;
+        const diff_in_hours = Math.floor(diff_in_seconds / 3600);
+        const diff_in_days = Math.floor(diff_in_hours / 24);
+
+        if (diff_in_days < 7) {
+            return res.status(100).json({ "msg": "Prices recently updated" });
+        }
+
+        latest.last_pull = new Date();
+
+        await latest.save();
+
+        // -------------------------------------------
+        // Only update stocks if last_pull was updated
+        // -------------------------------------------
+
         const stocks = await stock.find();
         const tickers = stocks.map(stock => stock.stock_ticker);
         if (!tickers.length || tickers.length == 0) {
@@ -360,7 +396,7 @@ exports.populateStockPrices = async (req, res) => {
             from: weekAgo.toISOString(),
             to: new Date().toISOString()
         });
-        //console.log(result)
+        
         for (resultTicker in result) {
             var resultData = result[resultTicker]
             var stockId = stocks.find(look => look.stock_ticker == resultTicker)._id;
@@ -368,11 +404,10 @@ exports.populateStockPrices = async (req, res) => {
                 let price = resultData[priceInd];
                 let newPrice = { "stock_id": stockId, "current_price": price.close, "time_pulled": price.date };
                 console.log(newPrice)
-                //stockPrice.create(newPrice);
             }
         }
+
         res.status(200).json({ msg: 'Success' });
-        return
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });

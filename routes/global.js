@@ -12,4 +12,7 @@ router.get("/stocks", globalController.getStocks);
 // Get specific user
 router.get("/user/:id", globalController.getOneUser);
 
+// Get latest fetch
+router.get("/fetch", globalController.getLastPull);
+
 module.exports = router;
