@@ -17,10 +17,10 @@ router.get("/requests", isAuth, userController.getFollowRequests);
 router.post("/follow/:userId", isAuth, userController.sendFollowRequest);
 
 // Accept follow request
-router.post("/follow/accept/:toFollow/:newFollower", userController.acceptFollowRequest);
+router.post("/follow/accept/:toFollow/", isAuth, userController.acceptFollowRequest);
 
 // Reject follow request
-router.post("/follow/reject/:toFollow/:newFollower", userController.rejectFollowRequest);
+router.post("/follow/reject/:toReject/", isAuth, userController.rejectFollowRequest);
 
 // Get user's trades
 router.get("/trades/:user_id", userController.getTrades);

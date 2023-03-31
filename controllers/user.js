@@ -64,15 +64,17 @@ exports.sendFollowRequest = async (req, res) => {
 
 exports.acceptFollowRequest = async (req, res) => {
     try {
-        let toFollow = req.params.toFollow
-        let newFollower = req.params.newFollower
-        let toFollowObj = user.findById(toFollow)
-        toFollowObj.followers.push(newFollower)
-        toFollowObj.requests.filter(e => e !== newFollower)
-        toFollowObj.save()
-        let newFollowerObj = user.findById(newFollower)
-        newFollowerObj.followees.push(toFollow)
-        newFollowerObj.save()
+        let newFollower = req.params.toFollow
+        let toFollow = req.user.id;
+        let toFollowObj = await User.findById(toFollow)
+        toFollowObj.followers += 1
+        toFollowObj.followers_list.push(newFollower)
+        toFollowObj.requests = toFollowObj.requests.filter(e => e.toString() !== newFollower)
+        await toFollowObj.save()
+        let newFollowerObj = await User.findById(newFollower)
+        newFollowerObj.following_list.push(toFollow)
+        newFollowerObj.following += 1
+        await newFollowerObj.save()
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
@@ -81,11 +83,11 @@ exports.acceptFollowRequest = async (req, res) => {
 
 exports.rejectFollowRequest = async (req, res) => {
     try {
-        let toFollow = req.params.toFollow
-        let newFollower = req.params.newFollower
-        let toFollowObj = user.findById(toFollow)
-        toFollowObj.requests.filter(e => e !== newFollower)
-        toFollowObj.save()
+        let toFollow = req.params.toReject
+        let newFollower = req.user.id;
+        let toFollowObj = await User.findById(newFollower)
+        toFollowObj.requests = toFollowObj.requests.filter(e => e.toString() !== toFollow)
+        await toFollowObj.save()
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });

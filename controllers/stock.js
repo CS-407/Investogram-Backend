@@ -9,6 +9,16 @@ const stockPrice = require("../models/stockPrice");
 const transaction = require("../models/transaction");
 const Global = require("../models/global");
 
+exports.getStock = async (req, res) => {
+    try {
+        stockInfo = await stock.findById(req.params.id);
+        res.status(200).json({ msg: 'Success' , data: stockInfo});
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 exports.add = async (req, res) => {
     try {
         const { stock_ticker, stock_name } = req.body;
@@ -248,6 +258,7 @@ exports.getPrice = async (req,res) => {
                 res.status(500).json({ msg: 'Server Error' });
                 return
             } else {
+                console.log(result)
                 res.status(200).json({msg:"Success", data: result});
                 return
             }
