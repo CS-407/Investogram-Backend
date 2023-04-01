@@ -94,6 +94,25 @@ exports.getStockPrice = async (req, res) => {
     }
 }
 
+exports.getVariousStocks = async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        //const session = await startSession();
+        const data = await stock.find();
+
+        if (!data) {
+            return res.status(404).json({ msg: 'Server Error' });
+        }
+
+        res.status(200).json({msg:"Success", "data": data});
+        //res.json(data)
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 exports.getPrice = async (req,res) => {
     try{
         const mongoose = require('mongoose');

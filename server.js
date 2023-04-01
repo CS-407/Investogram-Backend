@@ -21,6 +21,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const stockRoutes = require('./routes/stock');
 const blogRoutes = require('./routes/blog');
+const globalRoutes = require('./routes/global');
 
 //new
 //const stockPriceRoutes = require('./routes/')
@@ -40,6 +41,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/blog', blogRoutes);
+app.use('/api/global', globalRoutes);
 
 //new
 mongoose.set('strictQuery', false);

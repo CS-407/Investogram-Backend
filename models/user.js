@@ -25,7 +25,7 @@ const UserSchema = mongoose.Schema({
     },
     followers_list: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'users',
+        ref: 'User',
         default: []
     },
     following_list: {
@@ -40,4 +40,5 @@ const UserSchema = mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('User', UserSchema);
+//module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema, "users");

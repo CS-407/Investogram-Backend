@@ -4,7 +4,7 @@ const router = express.Router();
 const userController = require('../controllers/user');
 
 // Get followers
-router.get("/followers/:_id", userController.getFollowers);
+router.get("/followers/:_id", userController.getFollower);
 
 // Get followees
 router.get("/followees/:_id", userController.getFollowees);
@@ -19,6 +19,6 @@ router.post("/follow/accept", userController.acceptFollowRequest);
 router.post("/follow/reject", userController.rejectFollowRequest);
 
 // Get user's trades
-router.get("/trades", userController.getTrades);
+router.get("/trades/:_id", userController.getTrades);
 
 module.exports = router;
