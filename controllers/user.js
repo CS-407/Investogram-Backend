@@ -51,6 +51,12 @@ exports.sendFollowRequest = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
+        followUser.requests.forEach(_id => {
+            if (_id.toString() === id) {
+                return res.status(404).json({ msg: 'Request already sent' });
+            }
+        })
+
         followUser.requests.push(id);
 
         await followUser.save();
