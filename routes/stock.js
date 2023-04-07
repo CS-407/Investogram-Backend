@@ -8,10 +8,10 @@ const isAuth = require('../middleware/isAuth');
 router.post("/add", stockController.add);
 
 // Buy stock
-router.post("/buy", stockController.buy);
+router.post("/buy", isAuth, stockController.buy);
 
 // Sell stock
-router.post("/sell", stockController.sell);
+router.post("/sell", isAuth, stockController.sell);
 
 // Get Trades
 router.get("/trades/:user_id/:stock_id", stockController.getTrades);
