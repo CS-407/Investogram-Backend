@@ -1,7 +1,8 @@
 const User = require('../models/user');
 const Transaction = require('../models/transaction');
-const stock = require("../models/stock");
-const stockPrice = require("../models/stockPrice");
+const Stock = require("../models/stock");
+const StockPrice = require("../models/stockPrice");
+const mongoose = require('mongoose');
 
 exports.setProfilePic = async (req, res) => {
     try {
@@ -102,7 +103,9 @@ exports.rejectFollowRequest = async (req, res) => {
 
 exports.getFollowers = async (req, res) => {
     try {
+        const followers = await User.findById(req.user.id).select("followers_list").populate("followers_list", "username");
 
+        return res.status(200).json({ "followers": followers.followers_list });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
@@ -111,7 +114,9 @@ exports.getFollowers = async (req, res) => {
 
 exports.getFollowees = async (req, res) => {
     try {
+        const followees = await User.findById(req.user.id).select("following_list").populate("following_list", "username");
 
+        return res.status(200).json({ "followees": followees.following_list });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
@@ -119,11 +124,7 @@ exports.getFollowees = async (req, res) => {
 }
 
 exports.getTrades = async (req, res) => {
-
     try {
-
-        const mongoose = require('mongoose');
-
         const id = req.params.user_id;
 
         const user = await User.findById(id);
@@ -132,34 +133,64 @@ exports.getTrades = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        const trades = await Transaction.aggregate([
-            {
-              $match: {
-                  user_id: mongoose.Types.ObjectId(id)
-              }
-            },
-            {
-                $lookup: {
-                    from: stock.collection.name,
-                    localField: 'stock_id',
-                    foreignField: '_id',
-                    as: 'StockData',
-                }
-            },
-            {
-                $lookup: {
-                    from: stockPrice.collection.name,
-                    localField: 'stock_price_id',
-                    foreignField: '_id',
-                    as: 'StockPriceData',
-                }
-            }
-          ]).exec()
+        const trades = await Transaction.find({ user_id: id }).populate('stock_id').sort({ timestamp: -1 });
 
         if (!trades) {
             return res.status(404).json({ msg: 'Trades not found' });
         }
-        res.status(200).json({ msg: 'Success', data: trades });
+
+        // -------------------------------------------------
+        // Get number of stocks owned for each stock ticker
+        // -------------------------------------------------
+
+        const stock_info = {};
+        let amt;
+
+        trades.forEach(trade => {
+            amt = trade.no_of_shares;
+            if (!trade.buy) {
+                amt = 0 - amt;
+            }
+
+            if (stock_info[trade.stock_id.stock_ticker]) {
+                stock_info[trade.stock_id.stock_ticker]['owned'] += amt;
+            } else {
+                stock_info[trade.stock_id.stock_ticker] = {
+                    'stock_name': trade.stock_id.stock_name,
+                    'owned': amt
+                };
+            }
+        });
+
+        // ------------------------
+        // Get gains made by user
+        // ------------------------
+
+        let sells = trades.filter((trade) => trade.buy === false);
+        let revenue = sells.reduce((total, item) => total + item.amount_usd, 0);
+
+        // ------------------------
+        // Get losses made by user
+        // ------------------------
+
+        let buys = trades.filter((trade) => trade.buy === true);
+        let loss = buys.reduce((total, item) => total + item.amount_usd, 0);
+
+        // -------------------------------
+        // Get total revenue made by user
+        // -------------------------------
+
+        let profit = revenue - loss;
+
+        const revenue_obj = {
+            'purchases': buys.length,
+            'sales': sells.length,
+            'revenue': revenue,
+            'loss': loss,
+            'profit': profit
+        }
+
+        res.status(200).json({ msg: 'Success', trades: trades, stock_info: stock_info, monetary_info: revenue_obj });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
