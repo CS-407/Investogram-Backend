@@ -8,7 +8,7 @@ const isAuth = require('../middleware/isAuth');
 router.get("/followers", isAuth, userController.getFollowers);
 
 // Get followees
-router.get("/followees", isAuth, userController.getFollowees);
+router.get("/following", isAuth, userController.getFollowing);
 
 // Get follow requests
 router.get("/requests", isAuth, userController.getFollowRequests);
