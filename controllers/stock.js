@@ -8,6 +8,7 @@ const stock = require("../models/stock");
 const stockPrice = require("../models/stockPrice");
 const transaction = require("../models/transaction");
 const Global = require("../models/global");
+const mongoose = require('mongoose');
 
 exports.getStock = async (req, res) => {
     try {
@@ -123,7 +124,6 @@ exports.sell = async (req, res) => {
 
 exports.getTrades = async (req, res) => {
         try {
-            const mongoose = require('mongoose');
             let uid = req.params.user_id
             let stock_id = req.params.stock_id
             transaction.aggregate([
@@ -163,11 +163,10 @@ exports.getTrades = async (req, res) => {
             console.error(err.message);
             res.status(500).json({ msg: 'Server Error' });
         }
-    }
+}
 
 exports.getLeaderboard = async (req, res) => {
     try {
-        const mongoose = require('mongoose');
         let uid = req.params.user_id
         let stock_id = req.params.stock_id
 
@@ -244,7 +243,6 @@ exports.getStockPrice = async (req, res) => {
 
 exports.getPrice = async (req,res) => {
     try{
-        const mongoose = require('mongoose');
         const id = req.params.stock_id
         stockPrice.aggregate([
             {
@@ -271,8 +269,6 @@ exports.getPrice = async (req,res) => {
 
 exports.getPurchases = async (req, res) => {
     try {
-
-        const mongoose = require('mongoose');
         const id = req.params.stock_id
         transaction.aggregate([
             {
@@ -305,7 +301,6 @@ exports.getPurchases = async (req, res) => {
 
 exports.getPopularStocks = async (req, res) => {
     try {
-        const mongoose = require('mongoose');
         transaction.aggregate([
             {
                 $lookup: {
