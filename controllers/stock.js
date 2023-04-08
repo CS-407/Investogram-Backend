@@ -41,10 +41,8 @@ exports.buy = async (req, res) => {
     session.startTransaction();
 
     try {
-            
-
         // Balance logic
-        uid = req.body.user_id
+        uid = req.user.id;
         const user = await User.findById(uid);
         if (!user) {
             return res.status(400).json({ msg: 'User does not exist' });
@@ -54,16 +52,20 @@ exports.buy = async (req, res) => {
         }
         user.current_balance = user.current_balance - req.body.amount_usd;
         user.save();
-
         const timestamp = new Date().toISOString();
-        let newPost = { "user_id": req.body.user_id, "type": "StockBuy", "content": "Bought "+req.body.no_of_shares+" shares" , "timestamp": timestamp };
+
+        let newPost = { "user_id": uid, "type": "StockBuy", "content": "Bought "+req.body.no_of_shares+" shares" , "timestamp": timestamp };
         const postObj = await Post.create(newPost);
+
         if (!postObj) {
             return res.status(400).json({ msg: 'Post creation failed' });
         }
         req.body.timestamp = timestamp;
         req.body.post_id = postObj._id;
+
+        req.body.user_id = uid;
         const transactionObj = Transaction.create(req.body);
+
         if (!transactionObj) {
             return res.status(400).json({ msg: 'Transaction creation failed' });
         }
@@ -86,7 +88,7 @@ exports.sell = async (req, res) => {
 
     try {
         // Balance logic
-        uid = req.body.user_id
+        uid = req.user.id;
         const user = await User.findById(uid);
         if (!user) {
             return res.status(400).json({ msg: 'User does not exist' });
@@ -95,14 +97,19 @@ exports.sell = async (req, res) => {
         user.save();
 
         const timestamp = new Date().toISOString();
-        let newPost = { "user_id": req.body.user_id, "type": "StockSale", "content": "Sold "+req.body.no_of_shares+" shares" , "timestamp": timestamp };
+
+        let newPost = { "user_id": uid, "type": "StockSale", "content": "Sold "+req.body.no_of_shares+" shares" , "timestamp": timestamp };
         const postObj = await Post.create(newPost);
+
         if (!postObj) {
             return res.status(400).json({ msg: 'Post creation failed' });
         }
         req.body.timestamp = timestamp;
         req.body.post_id = postObj._id;
+
+        req.body.user_id = uid;
         const transactionObj = Transaction.create(req.body);
+
         if (!transactionObj) {
             return res.status(400).json({ msg: 'Transaction creation failed' });
         }
@@ -252,7 +259,6 @@ exports.getPrice = async (req,res) => {
                 res.status(500).json({ msg: 'Server Error' });
                 return
             } else {
-                console.log(result)
                 res.status(200).json({msg:"Success", data: result});
                 return
             }
