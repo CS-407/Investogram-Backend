@@ -1,18 +1,14 @@
-
-const { Model } = require("mongoose");
-const server = require("../server");
-const { findById } = require("../models/stock");
-const post = require("../models/post");
+const Post = require("../models/post");
 const User = require("../models/user");
-const stock = require("../models/stock");
-const stockPrice = require("../models/stockPrice");
-const transaction = require("../models/transaction");
+const Stock = require("../models/stock");
+const StockPrice = require("../models/stockPrice");
+const Transaction = require("../models/transaction");
 const Global = require("../models/global");
 const mongoose = require('mongoose');
 
 exports.getStock = async (req, res) => {
     try {
-        stockInfo = await stock.findById(req.params.id);
+        stockInfo = await Stock.findById(req.params.id);
         res.status(200).json({ msg: 'Success' , data: stockInfo});
     } catch (err) {
         console.error(err.message);
@@ -24,7 +20,7 @@ exports.add = async (req, res) => {
     try {
         const { stock_ticker, stock_name } = req.body;
 
-        const newStock = new stock({
+        const newStock = new Stock({
             stock_ticker: stock_ticker,
             stock_name: stock_name
         });
@@ -61,13 +57,13 @@ exports.buy = async (req, res) => {
 
         const timestamp = new Date().toISOString();
         let newPost = { "user_id": req.body.user_id, "type": "StockBuy", "content": "Bought "+req.body.no_of_shares+" shares" , "timestamp": timestamp };
-        const postObj = await post.create(newPost);
+        const postObj = await Post.create(newPost);
         if (!postObj) {
             return res.status(400).json({ msg: 'Post creation failed' });
         }
         req.body.timestamp = timestamp;
         req.body.post_id = postObj._id;
-        const transactionObj = transaction.create(req.body);
+        const transactionObj = Transaction.create(req.body);
         if (!transactionObj) {
             return res.status(400).json({ msg: 'Transaction creation failed' });
         }
@@ -100,13 +96,13 @@ exports.sell = async (req, res) => {
 
         const timestamp = new Date().toISOString();
         let newPost = { "user_id": req.body.user_id, "type": "StockSale", "content": "Sold "+req.body.no_of_shares+" shares" , "timestamp": timestamp };
-        const postObj = await post.create(newPost);
+        const postObj = await Post.create(newPost);
         if (!postObj) {
             return res.status(400).json({ msg: 'Post creation failed' });
         }
         req.body.timestamp = timestamp;
         req.body.post_id = postObj._id;
-        const transactionObj = transaction.create(req.body);
+        const transactionObj = Transaction.create(req.body);
         if (!transactionObj) {
             return res.status(400).json({ msg: 'Transaction creation failed' });
         }
@@ -126,7 +122,7 @@ exports.getTrades = async (req, res) => {
         try {
             let uid = req.params.user_id
             let stock_id = req.params.stock_id
-            transaction.aggregate([
+            Transaction.aggregate([
                 {
                   $match: {
                       stock_id: mongoose.Types.ObjectId(stock_id),
@@ -135,7 +131,7 @@ exports.getTrades = async (req, res) => {
                 },
                 {
                     $lookup: {
-                        from: stock.collection.name,
+                        from: Stock.collection.name,
                         localField: 'stock_id',
                         foreignField: '_id',
                         as: 'StockData',
@@ -143,7 +139,7 @@ exports.getTrades = async (req, res) => {
                 },
                 {
                     $lookup: {
-                        from: stockPrice.collection.name,
+                        from: StockPrice.collection.name,
                         localField: 'stock_price_id',
                         foreignField: '_id',
                         as: 'StockPriceData',
@@ -170,7 +166,7 @@ exports.getLeaderboard = async (req, res) => {
         let uid = req.params.user_id
         let stock_id = req.params.stock_id
 
-        transaction.aggregate([
+        Transaction.aggregate([
             {
               $match: {
                   stock_id: mongoose.Types.ObjectId(stock_id),
@@ -179,7 +175,7 @@ exports.getLeaderboard = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: stock.collection.name,
+                    from: Stock.collection.name,
                     localField: 'stock_id',
                     foreignField: '_id',
                     as: 'StockData',
@@ -187,7 +183,7 @@ exports.getLeaderboard = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: stockPrice.collection.name,
+                    from: StockPrice.collection.name,
                     localField: 'stock_price_id',
                     foreignField: '_id',
                     as: 'StockPriceData',
@@ -212,7 +208,7 @@ exports.getLeaderboard = async (req, res) => {
 exports.getHistory = async (req, res) => {
     try {
         let stock_id = req.params.stock_id
-        stockPrice.where('stock_id').equals(stock_id).exec(function (err, result) {
+        StockPrice.where('stock_id').equals(stock_id).exec(function (err, result) {
             if (err) {
                 console.log(err)
                 res.status(500).json({ msg: 'Server Error' });
@@ -232,7 +228,7 @@ exports.getStockPrice = async (req, res) => {
     try {
         const { startSession } = require('mongoose')
         const session = await startSession();
-        const data = await stockPrice.find();
+        const data = await StockPrice.find();
         res.json(data)
 
     } catch (err) {
@@ -244,7 +240,7 @@ exports.getStockPrice = async (req, res) => {
 exports.getPrice = async (req,res) => {
     try{
         const id = req.params.stock_id
-        stockPrice.aggregate([
+        StockPrice.aggregate([
             {
               $match: {
                   stock_id: mongoose.Types.ObjectId(id)
@@ -270,7 +266,7 @@ exports.getPrice = async (req,res) => {
 exports.getPurchases = async (req, res) => {
     try {
         const id = req.params.stock_id
-        transaction.aggregate([
+        Transaction.aggregate([
             {
               $match: {
                   stock_id: mongoose.Types.ObjectId(id),
@@ -301,10 +297,10 @@ exports.getPurchases = async (req, res) => {
 
 exports.getPopularStocks = async (req, res) => {
     try {
-        transaction.aggregate([
+        Transaction.aggregate([
             {
                 $lookup: {
-                    from: stock.collection.name,
+                    from: Stock.collection.name,
                     localField: 'stock_id',
                     foreignField: '_id',
                     as: 'StockData',
@@ -312,7 +308,7 @@ exports.getPopularStocks = async (req, res) => {
             },
             {
                 $lookup: {
-                    from: stockPrice.collection.name,
+                    from: StockPrice.collection.name,
                     localField: 'stock_price_id',
                     foreignField: '_id',
                     as: 'StockPriceData',
@@ -386,7 +382,7 @@ exports.populateStockPrices = async (req, res) => {
         // Only update stocks if last_pull was updated
         // -------------------------------------------
 
-        const stocks = await stock.find();
+        const stocks = await Stock.find();
         const tickers = stocks.map(stock => stock.stock_ticker);
         if (!tickers.length || tickers.length == 0) {
             res.status(400).json({ msg: 'No stocks found' });
@@ -408,7 +404,7 @@ exports.populateStockPrices = async (req, res) => {
             var stockId = stocks.find(look => look.stock_ticker == resultTicker)._id;
             for (priceInd in resultData) {
                 let price = resultData[priceInd];
-                let newPrice = new stockPrice({ "stock_id": stockId, "current_price": price.close, "time_pulled": price.date });
+                let newPrice = new StockPrice({ "stock_id": stockId, "current_price": price.close, "time_pulled": price.date });
                 
                 await newPrice.save();
             }
