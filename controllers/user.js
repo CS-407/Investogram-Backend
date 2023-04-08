@@ -112,11 +112,11 @@ exports.getFollowers = async (req, res) => {
     }
 }
 
-exports.getFollowees = async (req, res) => {
+exports.getFollowing = async (req, res) => {
     try {
-        const followees = await User.findById(req.user.id).select("following_list").populate("following_list", "username");
+        const following = await User.findById(req.user.id).select("following_list").populate("following_list", "username");
 
-        return res.status(200).json({ "followees": followees.following_list });
+        return res.status(200).json({ "following": following.following_list });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
