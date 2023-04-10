@@ -82,6 +82,7 @@ exports.acceptFollowRequest = async (req, res) => {
         newFollowerObj.following_list.push(toFollow)
         newFollowerObj.following += 1
         await newFollowerObj.save()
+        res.status(200).json({ msg: 'Success' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
@@ -95,6 +96,7 @@ exports.rejectFollowRequest = async (req, res) => {
         let toFollowObj = await User.findById(newFollower)
         toFollowObj.requests = toFollowObj.requests.filter(e => e.toString() !== toFollow)
         await toFollowObj.save()
+        res.status(200).json({ msg: 'Success' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
