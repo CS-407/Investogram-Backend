@@ -27,7 +27,7 @@ exports.getOneUser = async (req, res) => {
     try {
         const userId = req.params.id;
 
-        const user = await User.findById(userId).select("-password -requests");
+        const user = await User.findById(userId).select("-password -reset_token");
 
         if (!user) {
             return res.status(404).json({ msg: "User not found" });
