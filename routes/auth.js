@@ -5,10 +5,10 @@ const router = express.Router();
 const authController = require('../controllers/auth');
 
 // Login
-router.post('/login', body('email').isEmail(), body('password').isLength({ min: 6 }), authController.login);
+router.post('/login', body('email').isEmail(), body('password').isLength({ min: 6, max: 10 }), authController.login);
 
 // Register
-router.post('/signup', body('email').isEmail(), body('password').isLength({ min: 6 }), authController.signup);
+router.post('/signup', body('email').isEmail(), body('password').isLength({ min: 6, max: 10 }), authController.signup);
 
 // Forgot
 router.post('/forgot', body('email').isEmail(), authController.forgot);

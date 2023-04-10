@@ -5,6 +5,7 @@ const StockPrice = require("../models/stockPrice");
 const Transaction = require("../models/transaction");
 const Global = require("../models/global");
 const mongoose = require('mongoose');
+const { startSession } = require('mongoose');
 
 exports.getStock = async (req, res) => {
     try {
@@ -36,7 +37,6 @@ exports.add = async (req, res) => {
 
 exports.buy = async (req, res) => {
 
-    const { startSession } = require('mongoose')
     const session = await startSession();
     session.startTransaction();
 
@@ -82,7 +82,6 @@ exports.buy = async (req, res) => {
 }
 
 exports.sell = async (req, res) => {
-    const { startSession } = require('mongoose')
     const session = await startSession();
     session.startTransaction();
 
@@ -126,6 +125,27 @@ exports.sell = async (req, res) => {
 }
 
 exports.getTrades = async (req, res) => {
+    try {
+        const stockId = req.params.stockId;
+
+        const trades = await Transaction.find({ stock_id: stockId }).populate('user_id', 'name').sort({ timestamp: -1 });
+
+        if (!trades) {
+            return res.status(404).json({ msg: 'Trades not found' });
+        }
+
+        if (trades.length == 0) {
+            return res.status(200).json({ msg: 'No trades made' });
+        }
+
+        res.status(200).json({ msg: 'Success', data: trades });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getUserTrades = async (req, res) => {
         try {
             let uid = req.params.user_id
             let stock_id = req.params.stock_id

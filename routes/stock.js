@@ -13,8 +13,11 @@ router.post("/buy", isAuth, stockController.buy);
 // Sell stock
 router.post("/sell", isAuth, stockController.sell);
 
-// Get Trades
-router.get("/trades/:user_id/:stock_id", stockController.getTrades);
+// Get Trades (for a particular stock across all users)
+router.get("/trades/:stock_id", stockController.getTrades);
+
+// Get Trades (for a particular user on a particular stock)
+router.get("/trades/:user_id/:stock_id", stockController.getUserTrades);
 
 // Graph
 router.get("/history/:stock_id", stockController.getHistory);
