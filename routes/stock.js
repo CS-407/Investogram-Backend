@@ -16,6 +16,9 @@ router.post("/sell", isAuth, stockController.sell);
 // Get Trades
 router.get("/trades/:user_id/:stock_id", stockController.getTrades);
 
+// Get Trades for current user
+router.get("/userTrades/:stock_id", isAuth, stockController.getTradesForCurrentUser);
+
 // Graph
 router.get("/history/:stock_id", stockController.getHistory);
 
