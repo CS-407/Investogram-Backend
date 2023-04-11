@@ -205,3 +205,14 @@ exports.getTrades = async (req, res) => {
         res.status(500).json({ msg: 'Server Error' });
     }
 }
+
+exports.getBalance = async (req, res) => {
+    try {
+        const userData = await User.findById(req.user.id);
+        res.status(200).json({ msg: 'Success', balance: userData.current_balance });
+        return
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}

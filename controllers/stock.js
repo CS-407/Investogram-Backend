@@ -149,39 +149,9 @@ exports.getUserTrades = async (req, res) => {
         try {
             let uid = req.params.user_id
             let stock_id = req.params.stock_id
-            Transaction.aggregate([
-                {
-                  $match: {
-                      stock_id: mongoose.Types.ObjectId(stock_id),
-                      user_id: mongoose.Types.ObjectId(uid)
-                  }
-                },
-                {
-                    $lookup: {
-                        from: Stock.collection.name,
-                        localField: 'stock_id',
-                        foreignField: '_id',
-                        as: 'StockData',
-                    }
-                },
-                {
-                    $lookup: {
-                        from: StockPrice.collection.name,
-                        localField: 'stock_price_id',
-                        foreignField: '_id',
-                        as: 'StockPriceData',
-                    }
-                }
-              ]).exec(function (err, result) {
-                if (err) {
-                    console.log(err)
-                    res.status(500).json({ msg: 'Server Error' });
-                    return
-                } else {
-                    res.status(200).json({ msg: 'Success', data: result});
-                    return
-                }
-              });
+            let fetched = await Transaction.find({ user_id: uid, stock_id: stock_id }).populate('stock_id', '-__v').populate("stock_price_id", '-__v');
+            console.log(fetched)
+            res.status(200).json({ msg: 'Success', data: fetched });
         } catch (err) {
             console.error(err.message);
             res.status(500).json({ msg: 'Server Error' });
@@ -192,39 +162,9 @@ exports.getTradesForCurrentUser = async (req, res) => {
     try {
         let uid = req.user.id;
         let stock_id = req.params.stock_id
-        Transaction.aggregate([
-            {
-              $match: {
-                  stock_id: mongoose.Types.ObjectId(stock_id),
-                  user_id: mongoose.Types.ObjectId(uid)
-              }
-            },
-            {
-                $lookup: {
-                    from: Stock.collection.name,
-                    localField: 'stock_id',
-                    foreignField: '_id',
-                    as: 'StockData',
-                }
-            },
-            {
-                $lookup: {
-                    from: StockPrice.collection.name,
-                    localField: 'stock_price_id',
-                    foreignField: '_id',
-                    as: 'StockPriceData',
-                }
-            }
-          ]).exec(function (err, result) {
-            if (err) {
-                console.log(err)
-                res.status(500).json({ msg: 'Server Error' });
-                return
-            } else {
-                res.status(200).json({ msg: 'Success', data: result});
-                return
-            }
-          });
+        let fetched = await Transaction.find({ user_id: uid, stock_id: stock_id }).populate('stock_id', '-__v').populate("stock_price_id", '-__v');
+        console.log(fetched);
+        res.status(200).json({ msg: 'Success', data: fetched });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
