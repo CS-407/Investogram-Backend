@@ -25,4 +25,7 @@ router.post("/follow/reject/:toReject/", isAuth, userController.rejectFollowRequ
 // Get user's trades
 router.get("/trades/:user_id", userController.getTrades);
 
+// Get user
+router.get("/getBalance", isAuth, userController.getBalance);
+
 module.exports = router;
