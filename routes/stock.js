@@ -31,9 +31,6 @@ router.get("/leaderboard", isAuth, stockController.getLeaderboard);
 // Populate Stock Prices
 router.get("/populate", stockController.populateStockPrices);
 
-// TESTING -> not used for sprint 1
-router.get("/stockPrice", stockController.getStockPrice);
-
 //sprint1 - get stock price
 router.get("/price/:stock_id", stockController.getPrice);
 

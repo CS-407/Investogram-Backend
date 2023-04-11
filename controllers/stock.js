@@ -234,38 +234,17 @@ exports.getHistory = async (req, res) => {
     }
 }
 
-exports.getStockPrice = async (req, res) => {
-    try {
-        const { startSession } = require('mongoose')
-        const session = await startSession();
-        const data = await StockPrice.find();
-        res.json(data)
-
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
-    }
-}
-
 exports.getPrice = async (req,res) => {
     try{
         const id = req.params.stock_id
-        StockPrice.aggregate([
-            {
-              $match: {
-                  stock_id: mongoose.Types.ObjectId(id)
-              } 
-            }
-          ]).exec(function (err, result) {
-            if (err) {
-                console.log(err)
-                res.status(500).json({ msg: 'Server Error' });
-                return
-            } else {
-                res.status(200).json({msg:"Success", data: result});
-                return
-            }
-          });
+        
+        const stockPrices = await StockPrice.find({stock_id: id}).sort({ time_pulled: -1 }).limit(1);
+
+        if (!stockPrices || stockPrices.length == 0) {
+            return res.status(404).json({ msg: 'No stock price found' });
+        }
+
+        res.status(200).json({ msg: 'Success', data: stockPrices });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
