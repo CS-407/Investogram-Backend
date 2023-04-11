@@ -135,34 +135,11 @@ exports.getTrades = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        const trades = await Transaction.find({ user_id: id }).populate('stock_id').sort({ timestamp: -1 });
+        const trades = await Transaction.find({ user_id: id }).populate('stock_id', '-__v').populate("stock_price_id", '-__v').sort({ timestamp: -1 }).select("-__v");
 
         if (!trades) {
             return res.status(404).json({ msg: 'Trades not found' });
         }
-
-        // -------------------------------------------------
-        // Get number of stocks owned for each stock ticker
-        // -------------------------------------------------
-
-        const stock_info = {};
-        let amt;
-
-        trades.forEach(trade => {
-            amt = trade.no_of_shares;
-            if (!trade.buy) {
-                amt = 0 - amt;
-            }
-
-            if (stock_info[trade.stock_id.stock_ticker]) {
-                stock_info[trade.stock_id.stock_ticker]['owned'] += amt;
-            } else {
-                stock_info[trade.stock_id.stock_ticker] = {
-                    'stock_name': trade.stock_id.stock_name,
-                    'owned': amt
-                };
-            }
-        });
 
         // ------------------------
         // Get gains made by user
@@ -192,7 +169,37 @@ exports.getTrades = async (req, res) => {
             'profit': profit
         }
 
-        res.status(200).json({ msg: 'Success', trades: trades, stock_info: stock_info, monetary_info: revenue_obj });
+                // -------------------------------------------------
+        // Get number of stocks owned for each stock ticker
+        // -------------------------------------------------
+
+        const stock_info = {};
+        let amt;
+
+        trades.forEach(trade => {
+            amt = trade.no_of_shares;
+            if (!trade.buy) {
+                amt = 0 - amt;
+            }
+
+            if (stock_info[trade.stock_id.stock_ticker]) {
+                stock_info[trade.stock_id.stock_ticker]['owned'] += amt;
+            } else {
+                stock_info[trade.stock_id.stock_ticker] = {
+                    '_id': trade.stock_id._id,
+                    'stock_ticker': trade.stock_id.stock_ticker,
+                    'stock_name': trade.stock_id.stock_name,
+                    'owned': amt
+                };
+            }
+        });
+
+        for (const [key, value] of Object.entries(stock_info)) {
+            const cur_price = await StockPrice.find({ stock_id: stock_info[key]['_id'] }).sort({ time_pulled: -1 });
+            stock_info[key]['current_price'] = cur_price[0].current_price;
+        }
+
+        res.status(200).json({ msg: 'Success', trades: trades, stock_info: Object.values(stock_info), monetary_info: revenue_obj });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
