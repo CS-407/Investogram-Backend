@@ -20,6 +20,6 @@ router.patch('/resetpass', body('email').isEmail(), authController.resetPassword
 router.patch('/resetusername', body('email').isEmail(), authController.resetUsername);
 
 // Verify
-router.post('/verify', authController.verify);
+//router.post('/verify', authController.verify);
 
 module.exports = router;
