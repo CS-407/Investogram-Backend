@@ -16,6 +16,9 @@ router.get("/:postId", isAuth, blogController.getPost);
 // Get user's posts
 router.get("/", isAuth, blogController.getPosts);
 
+// Get another user's posts
+router.get("/user/:userId", isAuth, blogController.getUserPosts);
+
 // Like post
 router.post("/like/:postId", isAuth, blogController.like);
 
