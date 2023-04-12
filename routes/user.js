@@ -8,19 +8,25 @@ const isAuth = require('../middleware/isAuth');
 router.get("/followers", isAuth, userController.getFollowers);
 
 // Get followees
-router.get("/followees", isAuth, userController.getFollowees);
+router.get("/following", isAuth, userController.getFollowing);
+
+// Get follow requests
+router.get("/requests", isAuth, userController.getFollowRequests);
 
 // Send follow request
-router.post("/follow", isAuth, userController.sendFollowRequest);
+router.post("/follow/:userId", isAuth, userController.sendFollowRequest);
 
 // Accept follow request
-router.post("/follow/accept", isAuth, userController.acceptFollowRequest);
+router.post("/follow/accept/:toFollow/", isAuth, userController.acceptFollowRequest);
 
 // Reject follow request
-router.post("/follow/reject", isAuth, userController.rejectFollowRequest);
+router.post("/follow/reject/:toReject/", isAuth, userController.rejectFollowRequest);
 
 // Get user's trades
-router.get("/trades", isAuth, userController.getTrades);
+router.get("/trades/:user_id", userController.getTrades);
+
+// Get user
+router.get("/getBalance", isAuth, userController.getBalance);
 
 // Send delete Request
 router.delete("/deleteAcc", userController.deleteAcc);

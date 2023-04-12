@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "server": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,8 @@
     "express": "^4.18.2",
     "express-validator": "^6.14.3",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.9.0"
+    "mongoose": "^6.9.0",
+    "nodemon": "^2.0.22",
+    "yahoo-finance": "^0.3.8"
   }
 }

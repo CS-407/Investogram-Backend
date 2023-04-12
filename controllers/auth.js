@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 
 const dotenv = require('dotenv');
+const { sendForgotMail } = require('../services/email');
 dotenv.config();
 
 exports.login = async (req, res) => {
@@ -118,42 +119,81 @@ exports.verify = async (req, res) => {
 
 exports.forgotpass = async (req, res) => {
     try {
+        const { email } = req.body;
 
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ msg: 'No user with that email found' });
+        }
+
+        const new_reset_token = Math.floor((1 + Math.random()) * 10000);
+
+        user.reset_token = new_reset_token;
+
+        await user.save();
+
+        sendForgotMail(email, new_reset_token);
+
+        res.status(200).json({ msg: 'Mail sent' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
     }
 }
 
-exports.resetuser = async (req, res) => {
-    console.log("Check Reset User");
+exports.resetPassword = async (req, res) => {
     try {
-        const email = req.body.email;
-        const user = await User.findOne({ email: email });
+        const { email, password, password2, reset_token } = req.body;
+
+        if (password !== password2) {
+            return res.status(401).json({ msg: 'Passwords do not match' });
+        }
+
+        const user = await User.findOne({ email });
+
         if (!user) {
-            console.log("User not found");
-            return res.status(404).json({ msg: 'User not found' });
+            return res.status(404).json({ msg: 'No user with that email found' });
         }
-        const newusername = req.body.newusername;
-        const checkUsername = await User.findOne({username: newusername});
-        if (checkUsername) {
-            console.log("Username Taken");
-            return res.status(404).json({ msg: 'Username Taken' });
+
+        if (user.reset_token != reset_token) {
+            return res.status(401).json({ msg: 'Invalid reset token' });
         }
-        user.username = newusername;
-        user.save();
-        console.log("Success");
-        res.status(200).json({ msg: 'Success' });
-    }
-    catch (err) {
+
+        user.reset_token = 0;
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        user.password = hashedPassword;
+
+        await user.save();
+
+        res.status(200).json({ msg: 'Updated Successfully' });
+    } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
     }
 }
 
-exports.resetpass = async (req, res) => {
+exports.resetUsername = async (req, res) => {
     try {
+        const { email, new_username, reset_token } = req.body;
 
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ msg: 'No user with that email found' });
+        }
+
+        if (user.reset_token != reset_token) {
+            return res.status(401).json({ msg: 'Invalid reset token' });
+        }
+
+        user.reset_token = 0;
+        user.username = new_username;
+
+        await user.save();
+
+        res.status(200).json({ msg: 'Updated Successfully' });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });

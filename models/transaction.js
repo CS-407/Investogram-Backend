@@ -13,7 +13,7 @@ const TransactionSchema = mongoose.Schema({
     },
     stock_price_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'stockprices',
+        ref: 'StockPrice',
         required: true
     },
     no_of_shares: {
@@ -38,4 +38,4 @@ const TransactionSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Transaction', TransactionSchema);
+module.exports = mongoose.model('Transaction', TransactionSchema, "transactions");
