@@ -109,6 +109,7 @@ exports.deleteAcc = async(req, res) => {
         //const transaction = await Transaction.findByIdAndDelete(id);
         //const posts = await posts.findByIdAndDelete(id);
         if (!user) {
+            console.log("User not found");
             return res.status(404).json({ msg: 'User not found' });
         }
         const isEqual = await bcrypt.compare(password, user.password);

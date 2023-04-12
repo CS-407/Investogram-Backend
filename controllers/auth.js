@@ -61,6 +61,7 @@ exports.signup = async (req, res) => {
     const { email, username, password, password2 } = req.body;
 
     if (password !== password2) {
+        console.log("\tPasswords do not match");
         return res.status(401).json({ msg: 'Passwords do not match' })
     }
 
@@ -130,11 +131,13 @@ exports.resetuser = async (req, res) => {
         const email = req.body.email;
         const user = await User.findOne({ email: email });
         if (!user) {
+            console.log("User not found");
             return res.status(404).json({ msg: 'User not found' });
         }
         const newusername = req.body.newusername;
         const checkUsername = await User.findOne({username: newusername});
         if (checkUsername) {
+            console.log("Username Taken");
             return res.status(404).json({ msg: 'Username Taken' });
         }
         user.username = newusername;
