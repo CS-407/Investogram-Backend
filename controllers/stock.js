@@ -50,7 +50,7 @@ exports.buy = async (req, res) => {
         if (user.current_balance < req.body.amount_usd) { 
             return res.status(400).json({ msg: 'Insufficient balance' });
         }
-        user.current_balance = user.current_balance - req.body.amount_usd;
+        user.current_balance = user.current_balance - Number(req.body.amount_usd);
         user.save();
         const timestamp = new Date().toISOString();
 
@@ -92,7 +92,7 @@ exports.sell = async (req, res) => {
         if (!user) {
             return res.status(400).json({ msg: 'User does not exist' });
         }
-        user.current_balance = user.current_balance + req.body.amount_usd;
+        user.current_balance = user.current_balance + Number(req.body.amount_usd);
         user.save();
 
         const timestamp = new Date().toISOString();
