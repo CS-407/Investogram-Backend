@@ -1,206 +1,206 @@
-const User = require('../models/user');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const { validationResult } = require('express-validator');
+const User = require("../models/user");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { validationResult } = require("express-validator");
 
-const dotenv = require('dotenv');
-const { sendForgotMail } = require('../services/email');
+const dotenv = require("dotenv");
+const { sendForgotMail } = require("../services/email");
 dotenv.config();
 
 exports.login = async (req, res) => {
-    const errors = validationResult(req);
+	const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+	if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	}
 
-    const { email, password } = req.body;
+	const { email, password } = req.body;
 
-    try {
-        const existingUser = await User.findOne({ email: email });
+	try {
+		const existingUser = await User.findOne({ email: email });
 
-        if (!existingUser) {
-            return res.status(404).json({ msg: 'User not found' });
-        }
+		if (!existingUser) {
+			return res.status(404).json({ msg: "User not found" });
+		}
 
-        const isEqual = await bcrypt.compare(password, existingUser.password);
+		const isEqual = await bcrypt.compare(password, existingUser.password);
 
-        if (!isEqual) {
-            return res.status(401).json({ msg: 'Password incorrect' });
-        }
- 
-        const payload = {
-            user: {
-                id: existingUser._id
-            }
-        }
+		if (!isEqual) {
+			return res.status(401).json({ msg: "Password incorrect" });
+		}
 
-        jwt.sign(
-            payload,
-            process.env.SECRET,
-            {
-                expiresIn: 3600
-            },
-            (err, token) => {
-                if (err) throw err;
-                res.status(200).json({ token: token, user: existingUser })
-            }
-        )
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
-    }
-}
+		const payload = {
+			user: {
+				id: existingUser._id,
+			},
+		};
+
+		jwt.sign(
+			payload,
+			process.env.SECRET,
+			{
+				expiresIn: 3600,
+			},
+			(err, token) => {
+				if (err) throw err;
+				res.status(200).json({ token: token, user: existingUser });
+			}
+		);
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+};
 
 exports.signup = async (req, res) => {
-    const errors = validationResult(req);
+	const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+	if (!errors.isEmpty()) {
+		return res.status(400).json({ errors: errors.array() });
+	}
 
-    const { email, username, password, password2 } = req.body;
+	const { email, username, password, password2 } = req.body;
 
-    if (password !== password2) {
-        return res.status(401).json({ msg: 'Passwords do not match' })
-    }
+	if (password !== password2) {
+		return res.status(401).json({ msg: "Passwords do not match" });
+	}
 
-    try {
-        console.log("1");
-        const existingUser = await User.findOne({ username: username });
-        if (existingUser) {
-            console.log('\tExisting User - ');
-            return res.status(401).json({ msg: 'User already exists' });
-        }
+	try {
+		let existingUser = await User.findOne({ username: username });
+		
+		if (existingUser) {
+			console.log("\tExisting User - ");
+			return res.status(401).json({ msg: "Username is taken" });
+		}
 
-        const existingEmail = await User.findOne({ email: email });
-        if (existingEmail) {
-            console.log('\tExisting Email - ');
-            return res.status(401).json({ msg: 'Email already exists' });
-        }
-        const hashedPassword = await bcrypt.hash(password, 12);
-        console.log("2");
-        const newUser = new User({
-            email: email,
-            username: username,
-            password: hashedPassword
-        });
+		existingUser = await User.findOne({ email: email });
+		
+		if (existingUser) {
+			console.log("\tExisting Email - ");
+			return res.status(401).json({ msg: "Email already exists" });
+		}
 
-        await newUser.save();
-        console.log("3");
+		const hashedPassword = await bcrypt.hash(password, 12);
 
-        // Sign in user with jwt
-        const payload = {
-            user: {
-                id: newUser.id
-            }
-        }
+		const newUser = new User({
+			email: email,
+			username: username,
+			password: hashedPassword,
+		});
 
-        jwt.sign(
-            payload,
-            process.env.SECRET,
-            {
-                expiresIn: 3600
-            },
-            (err, token) => {
-                if (err) throw err;
-                res.status(200).json({ user: newUser, token })
-            }
-        )
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
-    }
-}
+		await newUser.save();
+
+		// Sign in user with jwt
+		const payload = {
+			user: {
+				id: newUser.id,
+			},
+		};
+
+		jwt.sign(
+			payload,
+			process.env.SECRET,
+			{
+				expiresIn: 3600,
+			},
+			(err, token) => {
+				if (err) throw err;
+				res.status(200).json({ user: newUser, token });
+			}
+		);
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+};
 
 exports.verify = async (req, res) => {
-    try {
-
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
-    }
-}
+	try {
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+};
 
 exports.forgot = async (req, res) => {
-    try {
-        const { email } = req.body;
+	try {
+		const { email } = req.body;
 
-        const user = await User.findOne({ email });
+		const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ msg: 'No user with that email found' });
-        }
+		if (!user) {
+			return res.status(404).json({ msg: "No user with that email found" });
+		}
 
-        const new_reset_token = Math.floor((1 + Math.random()) * 10000);
+		const new_reset_token = Math.floor((1 + Math.random()) * 10000);
 
-        user.reset_token = new_reset_token;
+		user.reset_token = new_reset_token;
 
-        await user.save();
+		await user.save();
 
-        sendForgotMail(email, new_reset_token);
+		sendForgotMail(email, new_reset_token);
 
-        res.status(200).json({ msg: 'Mail sent' });
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
-    }
-}
+		res.status(200).json({ msg: "Mail sent" });
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+};
 
 exports.resetPassword = async (req, res) => {
-    try {
-        const { email, password, password2, reset_token } = req.body;
+	try {
+		const { email, password, password2, reset_token } = req.body;
 
-        if (password !== password2) {
-            return res.status(401).json({ msg: 'Passwords do not match' });
-        }
+		if (password !== password2) {
+			return res.status(401).json({ msg: "Passwords do not match" });
+		}
 
-        const user = await User.findOne({ email });
+		const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ msg: 'No user with that email found' });
-        }
+		if (!user) {
+			return res.status(404).json({ msg: "No user with that email found" });
+		}
 
-        if (user.reset_token != reset_token) {
-            return res.status(401).json({ msg: 'Invalid reset token' });
-        }
+		if (user.reset_token != reset_token) {
+			return res.status(401).json({ msg: "Invalid reset token" });
+		}
 
-        user.reset_token = 0;
-        const hashedPassword = await bcrypt.hash(password, 12);
+		user.reset_token = 0;
+		const hashedPassword = await bcrypt.hash(password, 12);
 
-        user.password = hashedPassword;
+		user.password = hashedPassword;
 
-        await user.save();
+		await user.save();
 
-        res.status(200).json({ msg: 'Updated Successfully' });
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
-    }
-}
+		res.status(200).json({ msg: "Updated Successfully" });
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+};
 
 exports.resetUsername = async (req, res) => {
-    try {
-        const { email, new_username, reset_token } = req.body;
+	try {
+		const { email, new_username, reset_token } = req.body;
 
-        const user = await User.findOne({ email });
+		const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ msg: 'No user with that email found' });
-        }
+		if (!user) {
+			return res.status(404).json({ msg: "No user with that email found" });
+		}
 
-        if (user.reset_token != reset_token) {
-            return res.status(401).json({ msg: 'Invalid reset token' });
-        }
+		if (user.reset_token != reset_token) {
+			return res.status(401).json({ msg: "Invalid reset token" });
+		}
 
-        user.reset_token = 0;
-        user.username = new_username;
+		user.reset_token = 0;
+		user.username = new_username;
 
-        await user.save();
+		await user.save();
 
-        res.status(200).json({ msg: 'Updated Successfully' });
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ msg: 'Server Error' });
-    }
-}
+		res.status(200).json({ msg: "Updated Successfully" });
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+};
