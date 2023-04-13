@@ -11,7 +11,7 @@ const CommentSchema = mongoose.Schema({
         ref: 'posts',
         required: true
     },
-    conent: {
+    content: {
         type: mongoose.Schema.Types.String,
         required: true
     },
