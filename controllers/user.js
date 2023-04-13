@@ -241,6 +241,32 @@ exports.getBalance = async (req, res) => {
 	}
 };
 
+exports.deleteTrades = async (req, res) => {
+	try {
+		const user_id = req.body.user_id;
+		const stock_id = req.body.stock_id;
+
+		const user = await User.findById(user_id).select('username');
+
+		if (!user) {
+			return res.status(404).json({ msg: 'User not found' });
+		}
+
+		const stock = await Stock.findById(stock_id);
+
+		if (!stock) {
+			return res.status(404).json({ msg: 'Stock not found' });
+		}
+
+		await Transaction.deleteMany({ user_id: user_id, stock_id: stock_id });
+
+		res.status(200).json({ msg: 'Success' });
+	} catch (err) {
+		console.log(err);
+		res.status(500).json({ msg: "Server Error" });
+	}
+}
+
 exports.deleteAcc = async (req, res) => {
 	try {
 		const id = req.body.user_id;
