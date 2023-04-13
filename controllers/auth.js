@@ -114,14 +114,6 @@ exports.signup = async (req, res) => {
 	}
 };
 
-exports.verify = async (req, res) => {
-	try {
-	} catch (err) {
-		console.error(err.message);
-		res.status(500).json({ msg: "Server Error" });
-	}
-};
-
 exports.forgot = async (req, res) => {
 	try {
 		const { email } = req.body;
@@ -204,3 +196,53 @@ exports.resetUsername = async (req, res) => {
 		res.status(500).json({ msg: "Server Error" });
 	}
 };
+
+exports.updatePassword = async (req, res) => {
+	const { old_password, new_password, new_password_2 } = req.body;
+
+	try {
+		if (new_password !== new_password_2) {
+			return res.status(401).json({ msg: "Passwords do not match" });
+		}
+
+		const user = await User.findById(req.user.id);
+
+		const isEqual = await bcrypt.compare(old_password, user.password);
+
+		if (!isEqual) {
+			return res.status(401).json({ msg: "Password incorrect" });
+		}
+
+		const hashedPassword = await bcrypt.hash(new_password, 12);
+
+		user.password = hashedPassword;
+
+		await user.save();
+
+		res.status(200).json({ msg: "Updated Successfully" });
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+};
+
+exports.updateUsername = async (req, res) => {
+	const { old_username, new_username } = req.body;
+
+	try {
+		const user = await User.findById(req.user.id);
+
+		if (user.username !== old_username) {
+			return res.status(401).json({ msg: "Username incorrect" });
+		}
+
+		user.username = new_username;
+
+		await user.save();
+
+		res.status(200).json({ msg: "Updated Successfully" });
+	} catch (err) {
+		console.error(err.message);
+		res.status(500).json({ msg: "Server Error" });
+	}
+}

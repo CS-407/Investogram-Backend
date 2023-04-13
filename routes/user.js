@@ -28,6 +28,9 @@ router.get("/trades/:user_id", userController.getTrades);
 // Get user
 router.get("/getBalance", isAuth, userController.getBalance);
 
+// Delete trades for a stock
+router.delete("/deleteTrades/:user_id/:stock_id", userController.deleteTrades);
+
 // Send delete Request
 router.delete("/deleteAcc", userController.deleteAcc);
 
