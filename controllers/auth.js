@@ -68,12 +68,16 @@ exports.signup = async (req, res) => {
     try {
         console.log("1");
         const existingUser = await User.findOne({ username: username });
-
         if (existingUser) {
             console.log('\tExisting User - ');
             return res.status(401).json({ msg: 'User already exists' });
         }
 
+        const existingEmail = await User.findOne({ email: email });
+        if (existingEmail) {
+            console.log('\tExisting Email - ');
+            return res.status(401).json({ msg: 'Email already exists' });
+        }
         const hashedPassword = await bcrypt.hash(password, 12);
         console.log("2");
         const newUser = new User({
