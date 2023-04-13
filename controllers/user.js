@@ -243,8 +243,8 @@ exports.getBalance = async (req, res) => {
 
 exports.deleteTrades = async (req, res) => {
 	try {
-		const user_id = req.body.user_id;
-		const stock_id = req.body.stock_id;
+		const user_id = req.params.user_id;
+		const stock_id = req.params.stock_id;
 
 		const user = await User.findById(user_id).select('username');
 
