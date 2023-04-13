@@ -279,11 +279,6 @@ exports.deleteAcc = async (req, res) => {
 			return res.status(404).json({ msg: "User not found" });
 		}
 
-		if (id !== req.user.id) {
-			console.log("User not authorized");
-			return res.status(401).json({ msg: "User not authorized" });
-		}
-
 		const isEqual = await bcrypt.compare(password, user.password);
 		
 		if (!isEqual) {
