@@ -66,7 +66,8 @@ exports.signup = async (req, res) => {
     }
 
     try {
-        const existingUser = await User.findOne({ email: email });
+        console.log("1");
+        const existingUser = await User.findOne({ username: username });
 
         if (existingUser) {
             console.log('\tExisting User - ');
@@ -74,7 +75,7 @@ exports.signup = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
-
+        console.log("2");
         const newUser = new User({
             email: email,
             username: username,
@@ -82,6 +83,7 @@ exports.signup = async (req, res) => {
         });
 
         await newUser.save();
+        console.log("3");
 
         // Sign in user with jwt
         const payload = {
