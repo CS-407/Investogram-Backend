@@ -269,20 +269,21 @@ exports.deleteTrades = async (req, res) => {
 
 exports.deleteAcc = async (req, res) => {
 	try {
-		const id = req.body.user_id;
+		const username = req.body.username;
+        console.log(username);
 		const password = req.body.password;
 
-		const user = await User.findById(id);
+		const user = await User.findOne({username:username});
 
 		if (!user) {
 			console.log("User not found");
 			return res.status(404).json({ msg: "User not found" });
 		}
-
+        const id = user._id;
 		const isEqual = await bcrypt.compare(password, user.password);
 		
 		if (!isEqual) {
-			console.log("Password not matching");
+			console.log("Password incorrect");
 			return res.status(401).json({ msg: "Password incorrect" });
 		}
 
