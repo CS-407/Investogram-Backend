@@ -356,9 +356,8 @@ exports.populateStockPrices = async (req, res) => {
 
         const diff_in_seconds = t2 - t1;
         const diff_in_hours = Math.floor(diff_in_seconds / 3600);
-        const diff_in_days = Math.floor(diff_in_hours / 24);
 
-        if (diff_in_days < 7) {
+        if (diff_in_hours < 24) {
             return res.status(400).json({ "msg": "Prices recently updated" });
         }
 
