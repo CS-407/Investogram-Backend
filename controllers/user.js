@@ -275,14 +275,12 @@ exports.deleteAcc = async (req, res) => {
 		const user = await User.findById(id);
 
 		if (!user) {
-			console.log("User not found");
 			return res.status(404).json({ msg: "User not found" });
 		}
 
 		const isEqual = await bcrypt.compare(password, user.password);
 		
 		if (!isEqual) {
-			console.log("Password not matching");
 			return res.status(401).json({ msg: "Password incorrect" });
 		}
 

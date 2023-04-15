@@ -21,7 +21,7 @@ module.exports = (req, res, next) => {
 			return res.status(401).json({ msg: "Not authorized" });
 		}
 
-		console.log("token", token);
+		// console.log("token", token);
 
 		// Decode token
 		const decoded = jwt.verify(token, process.env.SECRET);

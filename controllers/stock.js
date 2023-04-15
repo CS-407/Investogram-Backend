@@ -150,7 +150,6 @@ exports.getUserTrades = async (req, res) => {
             let uid = req.params.user_id
             let stock_id = req.params.stock_id
             let fetched = await Transaction.find({ user_id: uid, stock_id: stock_id }).populate('stock_id', '-__v').populate("stock_price_id", '-__v');
-            console.log(fetched)
             res.status(200).json({ msg: 'Success', data: fetched });
         } catch (err) {
             console.error(err.message);
@@ -163,7 +162,6 @@ exports.getTradesForCurrentUser = async (req, res) => {
         let uid = req.user.id;
         let stock_id = req.params.stock_id
         let fetched = await Transaction.find({ user_id: uid, stock_id: stock_id }).populate('stock_id', '-__v').populate("stock_price_id", '-__v');
-        console.log(fetched);
         res.status(200).json({ msg: 'Success', data: fetched });
     } catch (err) {
         console.error(err.message);

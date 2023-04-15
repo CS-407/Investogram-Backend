@@ -69,14 +69,12 @@ exports.signup = async (req, res) => {
 		let existingUser = await User.findOne({ username: username });
 		
 		if (existingUser) {
-			console.log("\tExisting User - ");
 			return res.status(401).json({ msg: "Username is taken" });
 		}
 
 		existingUser = await User.findOne({ email: email });
 		
 		if (existingUser) {
-			console.log("\tExisting Email - ");
 			return res.status(401).json({ msg: "Email already exists" });
 		}
 
