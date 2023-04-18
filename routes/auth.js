@@ -8,7 +8,6 @@ const isAuth = require("../middleware/isAuth");
 // Login
 router.post(
 	"/login",
-	body("email").isEmail(),
 	body("password").isLength({ min: 6, max: 10 }),
 	authController.login
 );
@@ -34,7 +33,7 @@ router.patch(
 // Reset username
 router.patch(
 	"/resetusername",
-	body("email").isEmail(),
+	isAuth,
 	authController.resetUsername
 );
 
