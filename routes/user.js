@@ -34,4 +34,7 @@ router.delete("/deleteTrades/:user_id/:stock_id", userController.deleteTrades);
 // Send delete Request
 router.delete("/deleteAcc", userController.deleteAcc);
 
+// Get friends' trades
+router.get("/friendsTrades", isAuth, userController.getFriendsTrades);
+
 module.exports = router;

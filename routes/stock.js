@@ -43,4 +43,8 @@ router.get("/popularstocks", stockController.getPopularStocks);
 // Get a single stock info
 router.get("/get/:id", stockController.getStock);
 
+//router.get("/setCategories", stockController.setCategories);
+
+router.get("/getGroupedCategories", stockController.getGroupedCategories);
+
 module.exports = router;
