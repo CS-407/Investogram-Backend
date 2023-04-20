@@ -328,17 +328,19 @@ exports.deleteAcc = async (req, res) => {
 
 exports.getFriendsTrades = async (req, res) => {
 	try {
-		console.log("Here")
         let uid = req.user.id;
 		let friends = await User.findById(uid);
 		friends = friends.following_list;
+		friends = friends.map((uid) => uid.toString());
 		let trades = []
-		for (friend in friends) {
-			let add = await Transaction.find({ user_id: friend._id }).sort({ date: -1 }).limit(3);
-			let arrayObj = { friend: friend, trades: add}
+		for (const friend of friends) {
+			let add = await Transaction.find({ user_id: friend }).sort({ timestamp: 'desc' }).limit(3)
+				.populate("stock_id", "-__v")
+				.populate("stock_price_id", "-__v");
+			let friendObj = await User.findById(friend);
+			let arrayObj = { friend: friendObj, trades: add}
 			trades.push(arrayObj);
 		}
-		console.log(trades)
 		res.status(200).json({ msg: 'Success', data: trades });
     } catch (err) {
         console.error(err.message);
