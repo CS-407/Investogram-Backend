@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-// app.use(cors());
+app.use(cors());
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -20,7 +20,8 @@ app.use(express.json());
 
 app.use((req, res, next) => {
     console.log(req.url);
-    next();
+    // next();
+    return res.status(200).json({ msg: 'Hello' });
 });
 
 // Register routes
