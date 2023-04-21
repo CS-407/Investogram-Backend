@@ -32,6 +32,6 @@ router.get("/getBalance", isAuth, userController.getBalance);
 router.delete("/deleteTrades/:user_id/:stock_id", userController.deleteTrades);
 
 // Send delete Request
-router.delete("/deleteAcc", userController.deleteAcc);
+router.delete("/deleteAcc", isAuth, userController.deleteAcc);
 
 module.exports = router;
