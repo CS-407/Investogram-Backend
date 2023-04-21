@@ -18,15 +18,10 @@ const globalRoutes = require('./routes/global');
 app.use(express.urlencoded());
 app.use(express.json());
 
-app.use((req, res, next) => {
-    console.log(req.url);
-    // next();
-    return res.status(200).json({ msg: 'Hello' });
-});
-
-app.get("/", (req, res, next) => {
-    return "<html><body><h1>Hello World</h1></body></html>"
-})
+// app.use((req, res, next) => {
+//     console.log(req.url);
+//     next();
+// });
 
 // Register routes
 app.use('/api/auth', authRoutes);
@@ -34,6 +29,10 @@ app.use('/api/user', userRoutes);
 app.use('/api/stock', stockRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/global', globalRoutes);
+
+app.get("/", (req, res, next) => {
+    return "<html><body><h1>Hello World</h1></body></html>"
+})
 
 mongoose.set('strictQuery', false);
 

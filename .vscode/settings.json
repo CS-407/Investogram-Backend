@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/641965a6-8322-46f5-a455-ad662e865dfa/resourceGroups/investogram-backend-azure-service/providers/Microsoft.Web/sites/investogram-backend-azure2",
+    "appService.deploySubpath": "."
+}
