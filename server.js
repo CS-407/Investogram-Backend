@@ -24,6 +24,10 @@ app.use((req, res, next) => {
     return res.status(200).json({ msg: 'Hello' });
 });
 
+app.get("/", (req, res, next) => {
+    return "<html><body><h1>Hello World</h1></body></html>"
+})
+
 // Register routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
