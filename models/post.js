@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const PostSchema = mongoose.Schema({
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: true
     },
     type: {
@@ -24,7 +24,7 @@ const PostSchema = mongoose.Schema({
     },
     comments: {
         type: [mongoose.Schema.Types.ObjectId],
-        ref: 'comments',
+        ref: 'Comment',
         default: []
     }
 });
