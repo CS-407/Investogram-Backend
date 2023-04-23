@@ -325,3 +325,25 @@ exports.deleteAcc = async (req, res) => {
 		res.status(500).json({ msg: "Server Error" });
 	}
 };
+
+exports.getFriendsTrades = async (req, res) => {
+	try {
+        let uid = req.user.id;
+		let friends = await User.findById(uid);
+		friends = friends.following_list;
+		friends = friends.map((uid) => uid.toString());
+		let trades = []
+		for (const friend of friends) {
+			let add = await Transaction.find({ user_id: friend }).sort({ timestamp: 'desc' }).limit(3)
+				.populate("stock_id", "-__v")
+				.populate("stock_price_id", "-__v");
+			let friendObj = await User.findById(friend);
+			let arrayObj = { friend: friendObj, trades: add}
+			trades.push(arrayObj);
+		}
+		res.status(200).json({ msg: 'Success', data: trades });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
