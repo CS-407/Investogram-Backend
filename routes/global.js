@@ -12,4 +12,7 @@ router.get("/stocks", globalController.getStocks);
 // Get specific user
 router.get("/user/:id", globalController.getOneUser);
 
+// Get leaderboard
+router.get("/leaderboard", globalController.getLeaderboard);
+
 module.exports = router;
