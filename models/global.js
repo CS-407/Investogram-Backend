@@ -8,7 +8,7 @@ const GlobalSchema = mongoose.Schema({
     last_update: {
         type: mongoose.Schema.Types.Date,
         default: new Date().toISOString()
-    },
+    }
 });
 
 module.exports = mongoose.model('Global', GlobalSchema, "globals");

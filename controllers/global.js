@@ -120,6 +120,28 @@ exports.getLeaderboard = async (req, res) => {
             user.position = index + 1;
         });
 
+        // ---------------------------
+        // Credit top 10 performers
+        // ---------------------------
+
+        leaderboard.forEach(async (user) => {
+            if (user.position < 10) {
+                const cur_user = await User.findById(user.user_id);
+    
+                if (user.position == 1) {
+                    cur_user.current_balance += 10000;
+                } else if (user.position == 2) {
+                    cur_user.current_balance += 7500;
+                } else if (user.position == 3) {
+                    cur_user.current_balance += 5000;
+                } else {
+                    cur_user.current_balance += 2000;
+                }
+    
+                await cur_user.save();
+            }
+        });
+
         await Leaderboard.deleteMany();
 
         await Leaderboard.insertMany(leaderboard);
