@@ -1,28 +1,36 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
 module.exports = (req, res, next) => {
-    // Get token from header
-    const token = req.header('Authorization').split(" ")[1];
+	try {
+		// Get Authorization header
+		const authHeader = req.header("Authorization");
 
-    // Check if token exists
-    if (!token) {
-        return res.status(401).json({ msg: 'Not authorized' });
-    }
+		// Check if header exists
+		if (!authHeader) {
+			return res.status(401).json({ msg: "Not authorized" });
+		}
 
-    try {
-        console.log('token', token);
+		// Get token from header
+		const token = authHeader.split(" ")[1];
 
-        // Decode token
-        const decoded = jwt.verify(token, process.env.SECRET);
+		// Check if token exists
+		if (!token) {
+			return res.status(401).json({ msg: "Not authorized" });
+		}
 
-        // Set user and proceed
-        req.user =  decoded.user;
-        next();
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: 'Server error' });
-    }
-}
+		// console.log("token", token);
+
+		// Decode token
+		const decoded = jwt.verify(token, process.env.SECRET);
+
+		// Set user and proceed
+		req.user = decoded.user;
+		next();
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ msg: "Not authorized" });
+	}
+};

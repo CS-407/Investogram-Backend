@@ -1,5 +1,6 @@
 const Post = require('../models/post');
 const User = require("../models/user");
+const Comment = require("../models/comment");
 
 exports.newPost = async (req, res) => {
     try {
@@ -22,7 +23,7 @@ exports.newPost = async (req, res) => {
 
 exports.getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.postId);
+        const post = await Post.findById(req.params.postId).populate('user_id', 'name').populate('comments');
 
         if (!post) {
             return res.status(404).json({ msg: 'Post not found' });
@@ -116,7 +117,23 @@ exports.unlike = async (req, res) => {
 
 exports.newComment = async (req, res) => {
     try {
+        const postId = req.params.postId;
 
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+
+        const newComment = new Comment({
+            user_id: req.user.id,
+            post_id: postId,
+            content: req.body.content
+        });
+
+        await newComment.save();
+
+        res.status(200).json({ msg: 'Comment added', comment: newComment });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });

@@ -150,7 +150,6 @@ exports.getUserTrades = async (req, res) => {
             let uid = req.params.user_id
             let stock_id = req.params.stock_id
             let fetched = await Transaction.find({ user_id: uid, stock_id: stock_id }).populate('stock_id', '-__v').populate("stock_price_id", '-__v');
-            console.log(fetched)
             res.status(200).json({ msg: 'Success', data: fetched });
         } catch (err) {
             console.error(err.message);
@@ -163,7 +162,6 @@ exports.getTradesForCurrentUser = async (req, res) => {
         let uid = req.user.id;
         let stock_id = req.params.stock_id
         let fetched = await Transaction.find({ user_id: uid, stock_id: stock_id }).populate('stock_id', '-__v').populate("stock_price_id", '-__v');
-        console.log(fetched);
         res.status(200).json({ msg: 'Success', data: fetched });
     } catch (err) {
         console.error(err.message);
@@ -356,9 +354,8 @@ exports.populateStockPrices = async (req, res) => {
 
         const diff_in_seconds = t2 - t1;
         const diff_in_hours = Math.floor(diff_in_seconds / 3600);
-        const diff_in_days = Math.floor(diff_in_hours / 24);
 
-        if (diff_in_days < 7) {
+        if (diff_in_hours < 24) {
             return res.status(400).json({ "msg": "Prices recently updated" });
         }
 
@@ -399,6 +396,47 @@ exports.populateStockPrices = async (req, res) => {
         }
 
         res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+// Don't use me again
+exports.setCategories = async (req, res) => {
+    /*
+    try {
+        await Stock.updateMany({}, { categories: []});
+        res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+    */
+    try {
+        await User.updateMany({}, { profile_pic: 1 });
+        res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getGroupedCategories = async (req, res) => {
+    try {
+        const completeStocks = await Stock.find();
+        const categories = completeStocks.map(stock => stock.categories);
+        const flattened = [].concat.apply([], categories);
+        const unique = [...new Set(flattened)];
+        const grouped = unique.map(cat => {
+            return {
+                category: cat,
+                count: completeStocks.filter(stock => stock.categories.includes(cat)).length,
+                stocks: completeStocks.filter(stock => stock.categories.includes(cat))
+            }
+        });
+        const sorted = grouped.sort((a, b) => b.count - a.count);
+        res.status(200).json({ msg: 'Success', data: sorted });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
