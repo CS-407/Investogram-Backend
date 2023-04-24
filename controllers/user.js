@@ -321,7 +321,7 @@ exports.deleteAcc = async (req, res) => {
 		if (!delUser) {
 			return res.status(404).json({ msg: "Delete failed" });
 		}
-
+        console.log("Success");
 		res.status(200).json({ msg: "Success" });
 	} catch (err) {
 		console.error(err.message);

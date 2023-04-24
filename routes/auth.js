@@ -33,7 +33,7 @@ router.patch(
 
 // Reset username
 router.patch(
-	"/resetusername",
+	"/resetuser",
 	body("email").isEmail(),
 	authController.resetUsername
 );

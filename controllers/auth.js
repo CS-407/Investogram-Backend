@@ -164,6 +164,7 @@ exports.resetPassword = async (req, res) => {
 
 		await user.save();
 
+		console.log("Reset password successfully");
 		res.status(200).json({ msg: "Updated Successfully" });
 	} catch (err) {
 		console.error(err.message);
@@ -172,8 +173,9 @@ exports.resetPassword = async (req, res) => {
 };
 
 exports.resetUsername = async (req, res) => {
+	console.log("resetuser");
 	try {
-		const { email, new_username, reset_token } = req.body;
+		const { email, username, reset_token } = req.body;
 
 		const user = await User.findOne({ email });
 
@@ -186,7 +188,7 @@ exports.resetUsername = async (req, res) => {
 		}
 
 		user.reset_token = 0;
-		user.username = new_username;
+		user.username = username;
 
 		await user.save();
 
