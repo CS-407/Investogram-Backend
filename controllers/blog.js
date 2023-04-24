@@ -23,8 +23,15 @@ exports.newPost = async (req, res) => {
 
 exports.getPost = async (req, res) => {
     try {
-        const post = await Post.findById(req.params.postId).populate('user_id', 'name').populate('comments');
-
+        const post = await Post.findById(req.params.postId).populate('user_id', 'username').populate({
+            path: 'comments',
+            populate: {
+                path: 'user_id',
+                model: 'User',
+                select: 'username'
+            }
+        });
+        
         if (!post) {
             return res.status(404).json({ msg: 'Post not found' });
         }
@@ -131,9 +138,15 @@ exports.newComment = async (req, res) => {
             content: req.body.content
         });
 
-        await newComment.save();
+        const new_comment = await newComment.save();
 
-        res.status(200).json({ msg: 'Comment added', comment: newComment });
+        const populated_comment = await Comment.findById(new_comment._id).populate('user_id', 'username');
+
+        post.comments.push(newComment.id);
+
+        await post.save();
+
+        res.status(200).json({ msg: 'Comment added', comment: populated_comment });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
