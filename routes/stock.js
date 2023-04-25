@@ -47,4 +47,6 @@ router.get("/get/:id", stockController.getStock);
 
 router.get("/getGroupedCategories", stockController.getGroupedCategories);
 
+router.get("/getAllStocks", stockController.getAllStocks);
+
 module.exports = router;

@@ -442,3 +442,13 @@ exports.getGroupedCategories = async (req, res) => {
         res.status(500).json({ msg: 'Server Error' });
     }
 }
+
+exports.getAllStocks = async (req, res) => {
+    try {
+        const allStocks = await Stock.find();
+        res.status(200).json({ msg: 'Success', data: allStocks });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
