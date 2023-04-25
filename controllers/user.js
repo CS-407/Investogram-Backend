@@ -348,3 +348,31 @@ exports.getFriendsTrades = async (req, res) => {
         res.status(500).json({ msg: 'Server Error' });
     }
 }
+
+exports.updateProfilePic = async (req, res) => {
+	try {
+		console.log("Here")
+        let uid = req.user.id;
+		console.log(uid);
+		let newVal = req.params.picChoice;
+		let user = await User.findById(uid);
+		user.profile_pic = newVal;
+		await user.save();
+		res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getProfilePic = async (req, res) => {
+	try {
+        let uid = req.user.id;
+		let user = await User.findById(uid);
+		res.status(200).json({ msg: 'Success', data: user.profile_pic });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
