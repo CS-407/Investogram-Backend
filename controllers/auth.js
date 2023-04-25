@@ -59,7 +59,7 @@ exports.signup = async (req, res) => {
 		return res.status(400).json({ errors: errors.array() });
 	}
 
-	const { email, username, password, password2 } = req.body;
+	const { email, username, password, password2, profile_pic } = req.body;
 
 	if (password !== password2) {
 		return res.status(401).json({ msg: "Passwords do not match" });
@@ -84,6 +84,7 @@ exports.signup = async (req, res) => {
 			email: email,
 			username: username,
 			password: hashedPassword,
+			profile_pic: profile_pic
 		});
 
 		await newUser.save();
