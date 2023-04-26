@@ -370,8 +370,7 @@ exports.populateStockPrices = async (req, res) => {
         const stocks = await Stock.find();
         const tickers = stocks.map(stock => stock.stock_ticker);
         if (!tickers.length || tickers.length == 0) {
-            res.status(400).json({ msg: 'No stocks found' });
-            return
+            return res.status(400).json({ msg: 'No stocks found' });
         }
 
         var weekAgo = new Date();
