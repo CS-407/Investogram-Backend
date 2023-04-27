@@ -32,3 +32,14 @@ exports.updateList = async (req, res) => {
         res.status(500).json({ msg: 'Server Error' });
     }
 }
+
+exports.getUsersLists = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const obj = await StockList.find({ list_owner: userId });
+        res.status(200).json(obj);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
