@@ -269,7 +269,7 @@ exports.getPurchases = async (req, res) => {
           .exec(function (err, result) {
             if (err) {
                 console.log(err)
-                res.status(500).json({ msg: 'Server Error' });
+                res.status(500).json({ msg: 'No Purchases Found' });
                 return
             } else {
                 res.status(200).json({msg:"Success", data: result});
@@ -399,6 +399,134 @@ exports.populateStockPrices = async (req, res) => {
         }
 
         res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+
+exports.getFriend = async (req, res) => {
+    try {
+
+        const id = req.user.id;
+        //console.log(id);
+        //const id = req.params.user_id;
+
+		const user = await User.findById(id);
+        //console.log(user);
+
+		if (!user) {
+			return res.status(404).json({ msg: "Current User not found" });
+		}
+        const friendList = user.following_list;
+        const stock_id = req.params.stock_id;
+        Transaction.aggregate([
+            {
+                $lookup: {
+                    from: User.collection.name,
+                    localField: 'user_id',
+                    foreignField: '_id',
+                    as: 'UserData',
+                }
+            },
+            {
+              $match: {
+                  stock_id: mongoose.Types.ObjectId(stock_id),
+                  user_id: {$in: friendList},
+                  buy: {$in: ["true", true]}
+
+              }
+            },  
+            {
+                $sort: {
+                    timestamp: -1
+                }
+            },
+            {
+              $group: {
+                _id: {
+                user_id: "$user_id", 
+                username: "$UserData.username"
+                },
+                stock: {$addToSet: "$stock_id"}
+            }
+            }
+            
+          ])
+          .exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'No Friends purchased this stock' });
+                return
+            } else {
+                res.status(200).json({msg:"Success", data: result});
+                return
+            }
+          });
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getAggregateStocks = async (req, res) => {
+    try {
+        //const user_id = req.user.id;
+        const id = req.params.user_id;
+
+		const user = await User.findById(id);
+
+		if (!user) {
+			return res.status(404).json({ msg: "User not found" });
+		}
+        const friendList = user.following_list;
+        //const stock_id = req.params.stock_id
+        Transaction.aggregate([
+            {
+                $lookup: {
+                    from: Stock.collection.name,
+                    localField: 'stock_id',
+                    foreignField: '_id',
+                    as: 'StockData',
+                }
+            },
+            {
+              $match: {
+                  user_id: {$in: friendList},
+                  buy: {$in: ["true", true]}
+
+              }
+            },  
+            {
+                $sort: {
+                    timestamp: -1
+                }
+            },
+            {
+              $group: {
+                _id: { 
+                stock_id: "$stock_id", 
+                stock_name: "$StockData.stock_name",
+                stock_ticker: "$StockData.stock_ticker"
+                },
+                stock: {$addToSet: "$stock_id"}
+            }
+            }
+            
+          ])
+          .exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'Friends have bought no stocks' });
+                return
+            } else {
+                res.status(200).json({msg:"Success", data: result});
+                return
+            }
+          });
+
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
