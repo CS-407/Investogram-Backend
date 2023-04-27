@@ -47,6 +47,16 @@ const UserSchema = mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'User',
         default: []
+    },
+    liked_posts: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Post',
+        default: []
+    },
+    profile_pic: {
+        type: mongoose.SchemaTypes.Number,
+        default: 1,
+        required: true
     }
 });
 

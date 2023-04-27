@@ -14,10 +14,10 @@ exports.login = async (req, res) => {
 		return res.status(400).json({ errors: errors.array() });
 	}
 
-	const { email, password } = req.body;
+	const { username, password } = req.body;
 
 	try {
-		const existingUser = await User.findOne({ email: email });
+		const existingUser = await User.findOne({ username: username });
 
 		if (!existingUser) {
 			return res.status(404).json({ msg: "User not found" });
@@ -50,7 +50,7 @@ exports.login = async (req, res) => {
 		console.error(err.message);
 		res.status(500).json({ msg: "Server Error" });
 	}
-};
+}
 
 exports.signup = async (req, res) => {
 	const errors = validationResult(req);
@@ -59,7 +59,7 @@ exports.signup = async (req, res) => {
 		return res.status(400).json({ errors: errors.array() });
 	}
 
-	const { email, username, password, password2 } = req.body;
+	const { email, username, password, password2, profile_pic } = req.body;
 
 	if (password !== password2) {
 		return res.status(401).json({ msg: "Passwords do not match" });
@@ -69,14 +69,12 @@ exports.signup = async (req, res) => {
 		let existingUser = await User.findOne({ username: username });
 		
 		if (existingUser) {
-			console.log("\tExisting User - ");
 			return res.status(401).json({ msg: "Username is taken" });
 		}
 
 		existingUser = await User.findOne({ email: email });
 		
 		if (existingUser) {
-			console.log("\tExisting Email - ");
 			return res.status(401).json({ msg: "Email already exists" });
 		}
 
@@ -86,6 +84,7 @@ exports.signup = async (req, res) => {
 			email: email,
 			username: username,
 			password: hashedPassword,
+			profile_pic: profile_pic
 		});
 
 		await newUser.save();
@@ -198,7 +197,7 @@ exports.resetUsername = async (req, res) => {
 };
 
 exports.updatePassword = async (req, res) => {
-	const { old_password, new_password, new_password_2 } = req.body;
+	const { new_password, new_password_2 } = req.body;
 
 	try {
 		if (new_password !== new_password_2) {
@@ -206,12 +205,6 @@ exports.updatePassword = async (req, res) => {
 		}
 
 		const user = await User.findById(req.user.id);
-
-		const isEqual = await bcrypt.compare(old_password, user.password);
-
-		if (!isEqual) {
-			return res.status(401).json({ msg: "Password incorrect" });
-		}
 
 		const hashedPassword = await bcrypt.hash(new_password, 12);
 
@@ -227,14 +220,16 @@ exports.updatePassword = async (req, res) => {
 };
 
 exports.updateUsername = async (req, res) => {
-	const { old_username, new_username } = req.body;
+	const { new_username } = req.body;
 
 	try {
-		const user = await User.findById(req.user.id);
+		const existingUser = await User.findOne({ username: new_username }).select('username');
 
-		if (user.username !== old_username) {
-			return res.status(401).json({ msg: "Username incorrect" });
+		if (existingUser) {
+			return res.status(401).json({ msg: "Username is taken" });
 		}
+
+		const user = await User.findById(req.user.id);
 
 		user.username = new_username;
 

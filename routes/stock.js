@@ -49,4 +49,10 @@ router.get("/getFriends/:stock_id", isAuth, stockController.getFriend);
 //get aggregation of all stocks bought by friends
 router.get("/getAggregateStocks/:user_id", stockController.getAggregateStocks);
 
+//router.get("/setCategories", stockController.setCategories);
+
+router.get("/getGroupedCategories", stockController.getGroupedCategories);
+
+router.get("/getAllStocks", stockController.getAllStocks);
+
 module.exports = router;

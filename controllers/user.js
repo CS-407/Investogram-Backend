@@ -275,14 +275,12 @@ exports.deleteAcc = async (req, res) => {
 		const user = await User.findById(id);
 
 		if (!user) {
-			console.log("User not found");
 			return res.status(404).json({ msg: "User not found" });
 		}
 
 		const isEqual = await bcrypt.compare(password, user.password);
 		
 		if (!isEqual) {
-			console.log("Password not matching");
 			return res.status(401).json({ msg: "Password incorrect" });
 		}
 
@@ -327,3 +325,53 @@ exports.deleteAcc = async (req, res) => {
 		res.status(500).json({ msg: "Server Error" });
 	}
 };
+
+exports.getFriendsTrades = async (req, res) => {
+	try {
+        let uid = req.user.id;
+		let friends = await User.findById(uid);
+		friends = friends.following_list;
+		friends = friends.map((uid) => uid.toString());
+		let trades = []
+		for (const friend of friends) {
+			let add = await Transaction.find({ user_id: friend }).sort({ timestamp: 'desc' }).limit(3)
+				.populate("stock_id", "-__v")
+				.populate("stock_price_id", "-__v");
+			let friendObj = await User.findById(friend);
+			let arrayObj = { friend: friendObj, trades: add}
+			trades.push(arrayObj);
+		}
+		res.status(200).json({ msg: 'Success', data: trades });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.updateProfilePic = async (req, res) => {
+	try {
+		console.log("Here")
+        let uid = req.user.id;
+		console.log(uid);
+		let newVal = req.params.picChoice;
+		let user = await User.findById(uid);
+		user.profile_pic = newVal;
+		await user.save();
+		res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getProfilePic = async (req, res) => {
+	try {
+        let uid = req.user.id;
+		let user = await User.findById(uid);
+		res.status(200).json({ msg: 'Success', data: user.profile_pic });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
