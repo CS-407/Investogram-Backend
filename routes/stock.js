@@ -43,6 +43,12 @@ router.get("/popularstocks", stockController.getPopularStocks);
 // Get a single stock info
 router.get("/get/:id", stockController.getStock);
 
+//get list of friends that own a stock
+router.get("/getFriends/:stock_id", isAuth, stockController.getFriend);
+
+//get aggregation of all stocks bought by friends
+router.get("/getAggregateStocks/:user_id", stockController.getAggregateStocks);
+
 //router.get("/setCategories", stockController.setCategories);
 
 router.get("/getGroupedCategories", stockController.getGroupedCategories);
