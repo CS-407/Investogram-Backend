@@ -487,8 +487,8 @@ exports.setCategories = async (req, res) => {
 
 exports.getAggregateStocks = async (req, res) => {
     try {
-        //const user_id = req.user.id;
-        const id = req.params.user_id;
+        const id = req.user.id;
+        //const id = req.params.user_id;
 
 		const user = await User.findById(id);
 
@@ -571,6 +571,63 @@ exports.getAllStocks = async (req, res) => {
     try {
         const allStocks = await Stock.find();
         res.status(200).json({ msg: 'Success', data: allStocks });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getPopularStats = async (req, res) => {
+    try {
+        const stock_id = req.params.stock_id;
+        
+        Transaction.aggregate([
+            {
+                $lookup: {
+                    from: Stock.collection.name,
+                    localField: 'stock_id',
+                    foreignField: '_id',
+                    as: 'StockData',
+                }
+            },
+            {
+                $lookup: {
+                    from: StockPrice.collection.name,
+                    localField: 'stock_price_id',
+                    foreignField: '_id',
+                    as: 'StockPriceData',
+                }
+            },
+            {
+                $match: {
+                    stock_id: mongoose.Types.ObjectId(stock_id),
+                }
+            }, 
+            {
+                $group: {
+                    _id: {
+                    stock_id: "$stock_id",
+                    stock_name: "$StockData.stock_name",
+                    stock_ticker: "$StockData.stock_ticker"},
+                    totalTransactions: {$sum: "$no_of_shares"}
+                }
+            },
+            {
+                $sort: {totalTransactions: -1}
+            }
+            
+          ])
+          .exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'Server Error' });
+                return
+            } else {
+                res.status(200).json({msg:"Success", data: result});
+                return
+            }
+          });
+
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
