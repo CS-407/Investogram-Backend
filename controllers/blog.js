@@ -135,8 +135,23 @@ exports.like = async (req, res) => {
     }
 }
 
-exports.unlike = async (req, res) => {
+exports.hasliked = async (req, res) => {
+    console.log("hasliked");
     try {
+        const postId = req.params.postId;
+
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+        console.log(req.user.id);
+        var hasliked = false;
+        if (post.userlikes.indexOf(req.user.id.toString()) != -1) {
+            hasliked = true;
+        }
+        console.log(hasliked);
+        res.status(200).json({ msg: 'Has liked', isLiked: hasliked });
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });
