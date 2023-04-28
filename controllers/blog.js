@@ -46,22 +46,18 @@ exports.getPost = async (req, res) => {
 
 exports.getUserPosts = async (req, res) => {
     try {
-        const user = await User.findById(req.params.userId);
-
+        const userId = req.params.userId;
+        console.log(req.params.userId);
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        if (user.followers_list.indexOf(req.user.id) == -1) {
-            return res.status(401).json({ msg: 'Must follow user to see posts' });
-        }
-
-        const posts = await Post.find({ user_id: req.params.userId }).sort({ timestamp: -1 });
+        const posts = await Post.find({ user_id: userId }).sort({ timestamp: -1 });
 
         if (!posts || posts.length == 0) {
             return res.status(404).json({ msg: 'No posts found' });
         }
-
         res.status(200).json({ msg: 'Success', posts: posts });
     } catch (err) {
         console.error(err.message);
