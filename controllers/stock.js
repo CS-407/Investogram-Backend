@@ -267,7 +267,7 @@ exports.getPurchases = async (req, res) => {
           .exec(function (err, result) {
             if (err) {
                 console.log(err)
-                res.status(500).json({ msg: 'Server Error' });
+                res.status(500).json({ msg: 'No Purchases Found' });
                 return
             } else {
                 res.status(200).json({msg:"Success", data: result});
@@ -370,8 +370,7 @@ exports.populateStockPrices = async (req, res) => {
         const stocks = await Stock.find();
         const tickers = stocks.map(stock => stock.stock_ticker);
         if (!tickers.length || tickers.length == 0) {
-            res.status(400).json({ msg: 'No stocks found' });
-            return
+            return res.status(400).json({ msg: 'No stocks found' });
         }
 
         var weekAgo = new Date();
@@ -402,6 +401,70 @@ exports.populateStockPrices = async (req, res) => {
     }
 }
 
+exports.getFriend = async (req, res) => {
+    try {
+
+        const id = req.user.id;
+        //console.log(id);
+        //const id = req.params.user_id;
+
+		const user = await User.findById(id);
+        //console.log(user);
+
+		if (!user) {
+			return res.status(404).json({ msg: "Current User not found" });
+		}
+        const friendList = user.following_list;
+        const stock_id = req.params.stock_id;
+        Transaction.aggregate([
+            {
+                $lookup: {
+                    from: User.collection.name,
+                    localField: 'user_id',
+                    foreignField: '_id',
+                    as: 'UserData',
+                }
+            },
+            {
+              $match: {
+                  stock_id: mongoose.Types.ObjectId(stock_id),
+                  user_id: {$in: friendList},
+                  buy: {$in: ["true", true]}
+
+              }
+            },  
+            {
+                $sort: {
+                    timestamp: -1
+                }
+            },
+            {
+              $group: {
+                _id: {
+                user_id: "$user_id", 
+                username: "$UserData.username"
+                },
+                stock: {$addToSet: "$stock_id"}
+            }
+            }
+            
+          ])
+          .exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'No Friends purchased this stock' });
+                return
+            } else {
+                res.status(200).json({msg:"Success", data: result});
+                return
+            }
+          });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
 // Don't use me again
 exports.setCategories = async (req, res) => {
     /*
@@ -422,6 +485,67 @@ exports.setCategories = async (req, res) => {
     }
 }
 
+exports.getAggregateStocks = async (req, res) => {
+    try {
+        const id = req.user.id;
+        //const id = req.params.user_id;
+
+		const user = await User.findById(id);
+
+		if (!user) {
+			return res.status(404).json({ msg: "User not found" });
+		}
+        const friendList = user.following_list;
+        //const stock_id = req.params.stock_id
+        Transaction.aggregate([
+            {
+                $lookup: {
+                    from: Stock.collection.name,
+                    localField: 'stock_id',
+                    foreignField: '_id',
+                    as: 'StockData',
+                }
+            },
+            {
+              $match: {
+                  user_id: {$in: friendList},
+                  buy: {$in: ["true", true]}
+
+              }
+            },  
+            {
+                $sort: {
+                    timestamp: -1
+                }
+            },
+            {
+              $group: {
+                _id: { 
+                stock_id: "$stock_id", 
+                stock_name: "$StockData.stock_name",
+                stock_ticker: "$StockData.stock_ticker"
+                },
+                stock: {$addToSet: "$stock_id"}
+            }
+            }
+            
+          ])
+          .exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'Friends have bought no stocks' });
+                return
+            } else {
+                res.status(200).json({msg:"Success", data: result});
+                return
+            }
+          });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+          
 exports.getGroupedCategories = async (req, res) => {
     try {
         const completeStocks = await Stock.find();
@@ -437,6 +561,73 @@ exports.getGroupedCategories = async (req, res) => {
         });
         const sorted = grouped.sort((a, b) => b.count - a.count);
         res.status(200).json({ msg: 'Success', data: sorted });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getAllStocks = async (req, res) => {
+    try {
+        const allStocks = await Stock.find();
+        res.status(200).json({ msg: 'Success', data: allStocks });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getPopularStats = async (req, res) => {
+    try {
+        const stock_id = req.params.stock_id;
+        
+        Transaction.aggregate([
+            {
+                $lookup: {
+                    from: Stock.collection.name,
+                    localField: 'stock_id',
+                    foreignField: '_id',
+                    as: 'StockData',
+                }
+            },
+            {
+                $lookup: {
+                    from: StockPrice.collection.name,
+                    localField: 'stock_price_id',
+                    foreignField: '_id',
+                    as: 'StockPriceData',
+                }
+            },
+            {
+                $match: {
+                    stock_id: mongoose.Types.ObjectId(stock_id),
+                }
+            }, 
+            {
+                $group: {
+                    _id: {
+                    stock_id: "$stock_id",
+                    stock_name: "$StockData.stock_name",
+                    stock_ticker: "$StockData.stock_ticker"},
+                    totalTransactions: {$sum: "$no_of_shares"}
+                }
+            },
+            {
+                $sort: {totalTransactions: -1}
+            }
+            
+          ])
+          .exec(function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500).json({ msg: 'Server Error' });
+                return
+            } else {
+                res.status(200).json({msg:"Success", data: result});
+                return
+            }
+          });
+
     } catch (err) {
         console.error(err.message);
         res.status(500).json({ msg: 'Server Error' });

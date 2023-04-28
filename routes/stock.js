@@ -43,8 +43,19 @@ router.get("/popularstocks", stockController.getPopularStocks);
 // Get a single stock info
 router.get("/get/:id", stockController.getStock);
 
+//get list of friends that own a stock
+router.get("/getFriends/:stock_id", isAuth, stockController.getFriend);
+
+//get aggregation of all stocks bought by friends
+router.get("/getAggregateStocks", isAuth, stockController.getAggregateStocks);
+
 //router.get("/setCategories", stockController.setCategories);
 
 router.get("/getGroupedCategories", stockController.getGroupedCategories);
+
+router.get("/getAllStocks", stockController.getAllStocks);
+
+//sprint3 - get popular stocks statistics
+router.get("/popularstats/:stock_id", stockController.getPopularStats);
 
 module.exports = router;

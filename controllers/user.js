@@ -351,10 +351,9 @@ exports.getFriendsTrades = async (req, res) => {
 
 exports.updateProfilePic = async (req, res) => {
 	try {
-		console.log("Here")
         let uid = req.user.id;
-		console.log(uid);
 		let newVal = req.params.picChoice;
+		if (newVal < 1 || newVal > 5) { res.status(500).json({ msg: 'Invalid Pic Choice' }); return; }
 		let user = await User.findById(uid);
 		user.profile_pic = newVal;
 		await user.save();

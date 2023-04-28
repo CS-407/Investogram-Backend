@@ -3,6 +3,7 @@ const Stock = require("../models/stock");
 const Transaction = require("../models/transaction");
 const Global = require("../models/global");
 const Leaderboard = require('../models/leaderboard');
+const StockPrice = require("../models/stockPrice");
 
 exports.getUsers = async (req, res) => {
     try {
@@ -22,6 +23,49 @@ exports.getStocks = async (req, res) => {
         res.status(200).json({ "stocks": stocks });
     } catch (err) {
         console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getTradeInfo = async (req, res) => {
+    try {
+        const trades = await Transaction.aggregate([
+            {
+                $group: {
+                    _id: "$stock_id",
+                    num_shares: { $sum: "$no_of_shares" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "stocks",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "stock",
+                    
+                }
+            }
+        ]);
+
+        const stock_info = [];
+
+        trades.forEach((trade) => {
+            stock_info.push({
+                stock_id: trade._id,
+                num_shares: trade.num_shares,
+                stock_ticker: trade.stock[0].stock_ticker,
+                stock_name: trade.stock[0].stock_name,
+            });
+        });
+
+        for (const stock_obj of stock_info) {
+            const cur_price = await StockPrice.find({ stock_id: stock_obj["stock_id"] }).sort({ time_pulled: -1 });
+            stock_obj["current_price"] = cur_price[0].current_price;
+        }
+
+        return res.status(200).json({ msg: "Success", stock_info: stock_info });
+    } catch (err) {
+        console.log(err);
         res.status(500).json({ msg: 'Server Error' });
     }
 }

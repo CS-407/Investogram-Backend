@@ -9,6 +9,9 @@ router.get("/users", globalController.getUsers);
 // Get stocks
 router.get("/stocks", globalController.getStocks);
 
+// Get trade info
+router.get("/tradeinfo", globalController.getTradeInfo);
+
 // Get specific user
 router.get("/user/:id", globalController.getOneUser);
 
