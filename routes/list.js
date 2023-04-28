@@ -17,6 +17,6 @@ router.get("/get/:listId", isAuth, listController.getList);
 router.post("/update", listController.updateList);
 
 // Get a user's lists
-router.get("/getLists/:userId", listController.getUsersLists);
+router.get("/getLists/:userId", isAuth, listController.getUsersLists);
 
 module.exports = router;
