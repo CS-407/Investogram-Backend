@@ -451,7 +451,7 @@ exports.getFriend = async (req, res) => {
           ])
           .exec(function (err, result) {
             if (err) {
-                console.log(err)
+                //console.log(err)
                 res.status(500).json({ msg: 'No Friends purchased this stock' });
                 return
             } else {
@@ -532,7 +532,7 @@ exports.getAggregateStocks = async (req, res) => {
           ])
           .exec(function (err, result) {
             if (err) {
-                console.log(err)
+                //console.log(err)
                 res.status(500).json({ msg: 'Friends have bought no stocks' });
                 return
             } else {
