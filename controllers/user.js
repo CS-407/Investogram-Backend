@@ -55,11 +55,11 @@ exports.sendFollowRequest = async (req, res) => {
 			return res.status(404).json({ msg: "User not found" });
 		}
 
-		followUser.requests.forEach((_id) => {
-			if (_id.toString() === id) {
+		for (const req of followUser.requests) {
+			if (req.toString() === id) {
 				return res.status(404).json({ msg: "Request already sent" });
 			}
-		});
+		}
 
 		followUser.requests.push(id);
 
