@@ -22,8 +22,8 @@ router.get("/user/:userId", isAuth, blogController.getUserPosts);
 // Like post
 router.post("/like/:postId", isAuth, blogController.like);
 
-// Unlike post
-router.post("/unlike/:postId", isAuth, blogController.unlike);
+// Already liked post
+router.get("/hasliked/:postId", isAuth, blogController.hasliked);
 
 // Comment on post
 router.post("/comment/:postId", isAuth, blogController.newComment);
