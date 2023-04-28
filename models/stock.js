@@ -8,6 +8,10 @@ const StockSchema = mongoose.Schema({
     stock_name: {
         type: mongoose.Schema.Types.String,
         required: true
+    },
+    categories: {
+        type: [mongoose.Schema.Types.String],
+        required: true
     }
 });
 

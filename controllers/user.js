@@ -55,11 +55,11 @@ exports.sendFollowRequest = async (req, res) => {
 			return res.status(404).json({ msg: "User not found" });
 		}
 
-		followUser.requests.forEach((_id) => {
-			if (_id.toString() === id) {
+		for (const req of followUser.requests) {
+			if (req.toString() === id) {
 				return res.status(404).json({ msg: "Request already sent" });
 			}
-		});
+		}
 
 		followUser.requests.push(id);
 
@@ -269,15 +269,15 @@ exports.deleteTrades = async (req, res) => {
 
 exports.deleteAcc = async (req, res) => {
 	try {
-		const id = req.body.user_id;
 		const password = req.body.password;
 
-		const user = await User.findById(id);
+		const user = await User.findById(req.user.id);
 
 		if (!user) {
 			return res.status(404).json({ msg: "User not found" });
 		}
 
+        const id = user._id;
 		const isEqual = await bcrypt.compare(password, user.password);
 		
 		if (!isEqual) {
@@ -318,10 +318,58 @@ exports.deleteAcc = async (req, res) => {
 		if (!delUser) {
 			return res.status(404).json({ msg: "Delete failed" });
 		}
-
+        
 		res.status(200).json({ msg: "Success" });
 	} catch (err) {
 		console.error(err.message);
 		res.status(500).json({ msg: "Server Error" });
 	}
 };
+
+exports.getFriendsTrades = async (req, res) => {
+	try {
+        let uid = req.user.id;
+		let friends = await User.findById(uid);
+		friends = friends.following_list;
+		friends = friends.map((uid) => uid.toString());
+		let trades = []
+		for (const friend of friends) {
+			let add = await Transaction.find({ user_id: friend }).sort({ timestamp: 'desc' }).limit(3)
+				.populate("stock_id", "-__v")
+				.populate("stock_price_id", "-__v");
+			let friendObj = await User.findById(friend);
+			let arrayObj = { friend: friendObj, trades: add}
+			trades.push(arrayObj);
+		}
+		res.status(200).json({ msg: 'Success', data: trades });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.updateProfilePic = async (req, res) => {
+	try {
+        let uid = req.user.id;
+		let newVal = req.params.picChoice;
+		if (newVal < 1 || newVal > 5) { res.status(500).json({ msg: 'Invalid Pic Choice' }); return; }
+		let user = await User.findById(uid);
+		user.profile_pic = newVal;
+		await user.save();
+		res.status(200).json({ msg: 'Success' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}
+
+exports.getProfilePic = async (req, res) => {
+	try {
+        let uid = req.user.id;
+		let user = await User.findById(uid);
+		res.status(200).json({ msg: 'Success', data: user.profile_pic });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+}

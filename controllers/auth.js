@@ -59,7 +59,7 @@ exports.signup = async (req, res) => {
 		return res.status(400).json({ errors: errors.array() });
 	}
 
-	const { email, username, password, password2 } = req.body;
+	const { email, username, password, password2, profile_pic } = req.body;
 
 	if (password !== password2) {
 		return res.status(401).json({ msg: "Passwords do not match" });
@@ -84,6 +84,7 @@ exports.signup = async (req, res) => {
 			email: email,
 			username: username,
 			password: hashedPassword,
+			profile_pic: profile_pic
 		});
 
 		await newUser.save();
@@ -162,6 +163,7 @@ exports.resetPassword = async (req, res) => {
 
 		await user.save();
 
+		console.log("Reset password successfully");
 		res.status(200).json({ msg: "Updated Successfully" });
 	} catch (err) {
 		console.error(err.message);
@@ -170,8 +172,9 @@ exports.resetPassword = async (req, res) => {
 };
 
 exports.resetUsername = async (req, res) => {
+	console.log("resetuser");
 	try {
-		const { email, new_username, reset_token } = req.body;
+		const { email, username, reset_token } = req.body;
 
 		const user = await User.findOne({ email });
 
@@ -184,7 +187,7 @@ exports.resetUsername = async (req, res) => {
 		}
 
 		user.reset_token = 0;
-		user.username = new_username;
+		user.username = username;
 
 		await user.save();
 

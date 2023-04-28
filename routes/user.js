@@ -34,4 +34,13 @@ router.delete("/deleteTrades/:user_id/:stock_id", userController.deleteTrades);
 // Send delete Request
 router.delete("/deleteAcc", isAuth, userController.deleteAcc);
 
+// Get friends' trades
+router.get("/friendsTrades", isAuth, userController.getFriendsTrades);
+
+// Update profile pic 
+router.post("/updateProfilePic/:picChoice", isAuth, userController.updateProfilePic);
+
+// Update profile pic 
+router.get("/getProfilePic", isAuth, userController.getProfilePic);
+
 module.exports = router;
