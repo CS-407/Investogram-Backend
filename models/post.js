@@ -26,6 +26,11 @@ const PostSchema = mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Comment',
         default: []
+    },
+    userlikes: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'User',
+        default: []
     }
 });
 
